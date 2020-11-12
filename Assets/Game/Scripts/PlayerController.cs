@@ -10,12 +10,12 @@ namespace SoleHeir
         private float speed = 10;
         private float smoothTime = 0.05f;
         private Vector3 acceleration = Vector3.zero;
-        Rigidbody2D body;
+        Rigidbody body;
 
         // Start is called before the first frame update
         void Start()
         {
-            body = GetComponent<Rigidbody2D>();
+            body = GetComponent<Rigidbody>();
         }
 
         // Update is called once per frame
@@ -27,7 +27,7 @@ namespace SoleHeir
                 float h = Input.GetAxisRaw("moveX");
                 float v = Input.GetAxisRaw("moveY");
 
-                var newVelocity = new Vector3(h, v, 0);
+                var newVelocity = new Vector3(h, 0, v);
                 newVelocity.Normalize();
                 //newVelocity.Magnitude(speed);
                 body.velocity = Vector3.SmoothDamp(body.velocity, newVelocity*speed, ref acceleration, smoothTime);
