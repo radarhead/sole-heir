@@ -31,6 +31,11 @@ namespace SoleHeir
             AddMesh(new Vector2(x1,y1), new Vector2(x2,y2));
         }
 
+        public void DisableCollisions()
+        {
+            meshCollider.enabled = false;
+        }
+
         public void AddMesh(Vector2 start, Vector2 end)
         {
             if(vertices == null) 

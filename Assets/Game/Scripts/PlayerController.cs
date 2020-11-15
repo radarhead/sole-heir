@@ -28,7 +28,7 @@ namespace SoleHeir
                 float v = Input.GetAxisRaw("moveY");
 
                 var newVelocity = new Vector3(h, 0, v);
-                newVelocity.Normalize();
+                //newVelocity.Normalize();
                 //newVelocity.Magnitude(speed);
                 body.velocity = Vector3.SmoothDamp(body.velocity, newVelocity*speed, ref acceleration, smoothTime);
             }

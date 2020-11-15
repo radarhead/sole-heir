@@ -26,34 +26,21 @@ namespace SoleHeir
 
             if(player!=null)
             {
-                RoomGenerator currentRoom = null;
                 foreach (GameObject room in GameObject.FindGameObjectsWithTag("Room"))
                 {
                     RoomGenerator roomGenerator = room.GetComponent<RoomGenerator>();
-                    if(player.transform.position.x > roomGenerator.bottomLeft.x 
-                        && player.transform.position.x < roomGenerator.topRight.x
-                        && player.transform.position.z > roomGenerator.bottomLeft.z
-                        && player.transform.position.z < roomGenerator.topRight.z)
+                    if(player.transform.position.x > roomGenerator.bottomLeft.x - roomGenerator.roomSpacing/2
+                        && player.transform.position.x < roomGenerator.topRight.x + roomGenerator.roomSpacing/2
+                        && player.transform.position.z > roomGenerator.bottomLeft.z - roomGenerator.roomSpacing/2
+                        && player.transform.position.z < roomGenerator.topRight.z + roomGenerator.roomSpacing/2)
                     {
-                        currentRoom = roomGenerator;
+                        roomGenerator.SetEnabled(true);
                     }
-
-                }
-                if(currentRoom != null)
-                {
-                    foreach (TransparencyComponent transparency in GameObject.FindObjectsOfType<TransparencyComponent>())
+                    else
                     {
-                        if(transparency.currentRoom != currentRoom)
-                        {
-                            transparency.enabled = false;
-                        }
-                        else
-                        {
-                            transparency.enabled = true;
-                        }
+                        roomGenerator.SetEnabled(false);
                     }
                 }
-
             }
         }
     }
