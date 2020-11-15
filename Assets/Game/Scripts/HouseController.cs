@@ -15,6 +15,7 @@ namespace SoleHeir
         // Start is called before the first frame update
         void Start()
         {
+            //seed = Random.Range(0,999999999);
             Initialize();
         }
 

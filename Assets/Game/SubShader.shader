@@ -8,7 +8,7 @@
         _Metallic ("Metallic", Range(0,1)) = 0.0
     }
 SubShader {
-    Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
+    Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Fade"}
     LOD 200
 
     // extra pass that renders to depth buffer only

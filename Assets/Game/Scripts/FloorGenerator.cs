@@ -32,7 +32,7 @@ namespace SoleHeir
             {
                 if(doorway.other != null)
                 {
-                    createMesh.AddMesh(-0.5f, offset, 0, offset+2);
+                    createMesh.AddMesh(-roomSpacing/2, offset, 0, offset+2);
                 }
                 offset += roomHeight + roomSpacing;
 
@@ -43,7 +43,7 @@ namespace SoleHeir
             {
                 if(doorway.other != null)
                 {
-                    createMesh.AddMesh(offset, -0.5f, offset+2, 0);
+                    createMesh.AddMesh(offset, -roomSpacing/2, offset+2, 0);
                 }
                 offset += roomWidth + roomSpacing;
 
@@ -53,7 +53,7 @@ namespace SoleHeir
             {
                 if(doorway.other != null)
                 {
-                    createMesh.AddMesh(xSize, offset, xSize+0.5f, offset+2);
+                    createMesh.AddMesh(xSize, offset, xSize+roomSpacing/2, offset+2);
                 }
                 offset += roomHeight + roomSpacing;
 
@@ -64,7 +64,7 @@ namespace SoleHeir
             {
                 if(doorway.other != null)
                 {
-                    createMesh.AddMesh(offset, ySize, offset+2, ySize+0.5f);
+                    createMesh.AddMesh(offset, ySize, offset+2, ySize+roomSpacing/2);
                 }
                 offset += roomWidth + roomSpacing;
 

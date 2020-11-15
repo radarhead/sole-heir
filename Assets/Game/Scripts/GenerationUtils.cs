@@ -595,6 +595,33 @@ namespace SoleHeir.GenerationUtils
             grid = new GenerationPlane<GenerationPlane<T>>();
         }
 
+        public void SetRange(Vector2Int bottomLeft, Vector2Int topRight, T value)
+        {
+            for(int x = bottomLeft.x; x<=topRight.x; x++)
+            {
+                for(int y = bottomLeft.y; y<=topRight.y; y++)
+                {
+                    Set(x,y,value);
+                }
+            }
+        }
+
+        public int CountRange(Vector2Int bottomLeft, Vector2Int topRight, T value)
+        {
+            int count = 0;
+            for(int x = bottomLeft.x; x<=topRight.x; x++)
+            {
+                for(int y = bottomLeft.y; y<=topRight.y; y++)
+                {
+                    if(Get(x,y).Equals(value))
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
         public T Get(Vector2Int vector)
         {
             return Get(vector.x, vector.y);
@@ -692,6 +719,8 @@ namespace SoleHeir.GenerationUtils
             array = new T[1];
         }
 
+
+
         public void Set(int index, T value)
         {
             if (index < min)
@@ -739,5 +768,16 @@ namespace SoleHeir.GenerationUtils
         LONG,
         SMALL,
         HALLWAY
+    }
+
+    public enum SpaceType
+    {
+        ROOM_FILLED,
+        ROOM_OPEN,
+        ROOM_WALL_LEFT,
+        ROOM_WALL_RIGHT,
+        ROOM_WALL_TOP,
+        ROOM_CORNER_LEFT,
+        ROOM_CORNER_RIGHT
     }
 }
