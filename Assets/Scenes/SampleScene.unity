@@ -203,7 +203,7 @@ Camera:
   m_TargetEye: 0
   m_HDR: 1
   m_AllowMSAA: 1
-  m_AllowDynamicResolution: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
@@ -315,7 +315,8 @@ MonoBehaviour:
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs:
-  - {fileID: 8612332323232293630, guid: 38742636aa2778249ac0cdb1466ec5b0, type: 3}
+  - {fileID: 6497942227307708545, guid: 9d0e321d43f2b7b4ebca6eb3e2146d73, type: 3}
+  - {fileID: 7812962003808045124, guid: 4684a66dbbefeec43b5cd6d2073a81e1, type: 3}
 --- !u!4 &610456793
 Transform:
   m_ObjectHideFlags: 0

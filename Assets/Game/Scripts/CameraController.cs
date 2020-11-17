@@ -24,7 +24,7 @@ namespace SoleHeir
         }
 
         // Update is called once per frame
-        void Update()
+        void FixedUpdate()
         {
             GameObject player = null;
             foreach (GameObject thisPlayer in GameObject.FindGameObjectsWithTag("Player"))
