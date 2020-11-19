@@ -121,13 +121,13 @@ namespace SoleHeir
             CreateMesh darkLeftMesh = darkLeft.GetComponent(typeof(CreateMesh)) as CreateMesh;
             darkLeftMesh.AddMesh(new Vector2(-roomSpacing/2,0), new Vector2(ySize, wallHeight));
             darkLeftMesh.DisableCollisions();
-            darkLeft.transform.position = new Vector3(-roomSpacing/2, wallHeight, 0);
+            darkLeft.transform.localPosition = new Vector3(-roomSpacing/2, wallHeight, 0);
 
             GameObject darkRight = transform.Find("DarkWallRight").gameObject;
             CreateMesh darkRightMesh = darkRight.GetComponent(typeof(CreateMesh)) as CreateMesh;
             darkRightMesh.AddMesh(new Vector2(-roomSpacing/2,0), new Vector2(ySize, wallHeight));
             darkRightMesh.DisableCollisions();
-            darkRight.transform.position = new Vector3(xSize+roomSpacing/2, 0, 0);
+            darkRight.transform.localPosition = new Vector3(xSize+roomSpacing/2, 0, 0);
 
             GameObject topFront = transform.Find("TopFront").gameObject;
             CreateMesh topFrontMesh = topFront.GetComponent(typeof(CreateMesh)) as CreateMesh;

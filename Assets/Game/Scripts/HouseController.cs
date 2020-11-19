@@ -31,7 +31,7 @@ namespace SoleHeir
 
             foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
             {
-                GameObject room = (GameObject) GameObject.Instantiate(roomPrefab, Vector3.zero, Quaternion.identity);
+                GameObject room = (GameObject) GameObject.Instantiate(roomPrefab, transform);
                 room.GetComponent<RoomGenerator>().Initialize(prototypeRoom);
             }
         }

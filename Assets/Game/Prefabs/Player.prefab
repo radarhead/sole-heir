@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4014963123768716748}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0.005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6783063858549230163}
@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 8512274412745805060}
   - component: {fileID: 6337212097943369062}
   - component: {fileID: 7351331430389796646}
-  - component: {fileID: -4139686601699991063}
+  - component: {fileID: -628245014196846892}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -143,12 +143,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
-  syncInterval: 0.1
-  bulletPrefab: {fileID: 6497942227307708545, guid: 9d0e321d43f2b7b4ebca6eb3e2146d73,
+  syncInterval: 0
+  speed: 10
+  smoothTime: 0.05
+  rotationTime: 1
+  overlapRadius: 2
+  rotationSpeed: 10
+  dodgeRollSpeed: 20
+  dodgeRollTime: 0.2
+  dodgeRollSlowDown: 0.2
+  dodgeRollLag: 0.05
+  carryablePrefab: {fileID: 8047647315768830398, guid: 677b18cbd77a75f418bbd8d380b98dd4,
     type: 3}
-  heldItem: {fileID: 0}
   gunPrefab: {fileID: 7812962003808045124, guid: 4684a66dbbefeec43b5cd6d2073a81e1,
     type: 3}
+  bulletPrefab: {fileID: 6497942227307708545, guid: 9d0e321d43f2b7b4ebca6eb3e2146d73,
+    type: 3}
+  carriedItem: 0
 --- !u!114 &8512274412745805060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,14 +184,14 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6783063858549230160}
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 100
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 116
-  m_CollisionDetection: 0
+  m_Constraints: 112
+  m_CollisionDetection: 2
 --- !u!114 &7351331430389796646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,7 +286,7 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &-4139686601699991063
+--- !u!114 &-628245014196846892
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -288,7 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
-  syncInterval: 0.02
+  syncInterval: 0
   target: {fileID: 6337212097943369062}
   lerpVelocityAmount: 0.5
   lerpPositionAmount: 0.5

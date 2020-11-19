@@ -7,34 +7,66 @@ namespace SoleHeir
 {
     public class BulletController : NetworkBehaviour
     {
+        private Vector3 prevPos;
+        public uint trailId=0;
+        private GameObject trail;
+        public GameObject particlePrefab;
         // Start is called before the first frame update
         void Start()
         {
+            if(!isServer)
+            {
+                gameObject.GetComponentInChildren<Rigidbody>().detectCollisions = false;
+            }
+            
+            else
+            {
+                trail = Instantiate(particlePrefab, BulletHoleSystem.instance.transform);
+                trail.transform.position = transform.position;
+                NetworkServer.Spawn(trail);
+            }
+        }
+
+        void Update()
+        {
+            if(isServer && trailId == 0)
+            {
+                this.trailId = trail.GetComponent<BulletParticleController>().netId;
+                RpcSetTrailId(this.trailId);
+            }
+        }
+
+        [ClientRpc]
+        void RpcSetTrailId(uint trailId)
+        {
+            if (NetworkIdentity.spawned.TryGetValue(trailId, out NetworkIdentity identity))
+            {
+                trail = identity.gameObject;
+            }
         }
 
         // Update is called once per frame
-        void Update()
+        void FixedUpdate()
         {
-            //Ray ray = new Ray(transform.position, transform.forward);
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.forward, out hit))
-            {
-                if(hit.distance < 2)
-                {
-                    HasHit(hit);
-
-                }
-            } 
+            trail.transform.position = transform.position;
+                       
         }
 
-        void HasHit(RaycastHit hit)
-        {
-            transform.Find("Trail").position = hit.point;
-            transform.Find("Trail").parent = null;
-            //t = null;
-            
-            Destroy(gameObject);
-            NetworkServer.Destroy(gameObject);
+        void OnCollisionEnter(Collision collision) {
+            if(isServer)
+            {
+                foreach(ContactPoint contact in collision.contacts)
+                {
+                    trail.GetComponent<BulletParticleController>().RpcDetonate(contact.point, contact.normal);
+
+                    BulletHoleSystem.instance.SpawnHole(contact);
+                    
+                    Destroy(gameObject);
+                    NetworkServer.Destroy(gameObject);
+                    return;
+                }
+            }
+
         }
     }
 
