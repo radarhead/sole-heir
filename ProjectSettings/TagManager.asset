@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Systems and Logic
   - Room
+  - SpawnLocation
   layers:
   - Default
   - TransparentFX

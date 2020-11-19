@@ -7,7 +7,12 @@ namespace SoleHeir
 {
     public class CameraController : MonoBehaviour
     {
+        public static CameraController instance = null;
+        public float screenShakeVelocity;
+        public float screenShakeAmt;
+        private float screenShake = 0f;
         public float smoothTime = 0.15f;
+        private Vector3 realPosition = Vector3.zero;
         public Vector3 offset;
         public Vector3 rotation;
         private Vector3 currentRoom;
@@ -17,15 +22,25 @@ namespace SoleHeir
         public float bottomY = 0;
         public float bottomYOffset = -1;
 
-        // Start is called before the first frame update
-        void Start()
-        {
 
+
+        // Start is called before the first frame update
+        void Awake()
+        {
+            if(instance == null)
+            {
+                instance = this;
+            }
+            else if(instance != this)
+            {
+                Destroy(gameObject);
+            }
         }
 
         // Update is called once per frame
-        void Update()
+        void FixedUpdate()
         {
+            screenShake = Mathf.Max(0f, screenShake - Time.deltaTime*screenShakeVelocity);
             GameObject player = null;
             foreach (GameObject thisPlayer in GameObject.FindGameObjectsWithTag("Player"))
             {
@@ -60,8 +75,17 @@ namespace SoleHeir
                 transform.rotation = Quaternion.Euler(rotation);
                 targetPosition = ((player.transform.position*2 + currentRoom) / 3) + transform.rotation*targetOffset;
                 targetPosition = new Vector3(targetPosition.x, targetPosition.y, Math.Max(targetPosition.z, bottomY + bottomYOffset));
-                transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+                realPosition = Vector3.SmoothDamp(realPosition, targetPosition, ref velocity, smoothTime);
+                transform.position = realPosition + new Vector3(
+                    UnityEngine.Random.Range(-screenShake, screenShake),
+                    0,
+                    UnityEngine.Random.Range(-screenShake, screenShake));
             }
+        }
+
+        public void SetScreenShake(float screenShake)
+        {
+            this.screenShake = screenShakeAmt*screenShake;
         }
     }
 }
