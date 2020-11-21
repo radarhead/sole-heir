@@ -48,8 +48,7 @@ namespace SoleHeir
         // Update is called once per frame
         void FixedUpdate()
         {
-            trail.transform.position = transform.position;
-                       
+            if(trail != null) trail.transform.position = transform.position;
         }
 
         void OnCollisionEnter(Collision collision) {

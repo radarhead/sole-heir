@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SoleHeir.GenerationUtils;
+using Mirror;
 
 namespace SoleHeir
 {
-    public class HouseController : MonoBehaviour
+    public class HouseController : NetworkBehaviour
     {
+        [SyncVar]
         public int seed = 0;
+        [SyncVar]
         public int houseSize = 30;
         private PrototypeHouse prototypeHouse;
         public GameObject roomPrefab;
@@ -15,25 +18,55 @@ namespace SoleHeir
         // Start is called before the first frame update
         void Start()
         {
+            
+        }
+
+        public override void OnStartServer()
+        {
+            UnityEngine.Random.InitState (seed);
             //seed = Random.Range(0,999999999);
-            Initialize();
+            prototypeHouse = new PrototypeHouse(seed, houseSize);
+            foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
+            {
+                GameObject room = (GameObject) GameObject.Instantiate(roomPrefab, transform);
+                room.GetComponent<RoomGenerator>().prototypeRoom = prototypeRoom;
+                room.GetComponent<RoomGenerator>().roomPosition = prototypeRoom.GetPosition();
+                NetworkServer.Spawn(room);
+
+                room.GetComponent<RoomGenerator>().InitializeGrid();
+                room.GetComponent<RoomGenerator>().AddSpawner();
+                room.GetComponent<RoomGenerator>().Furnish();
+                //room.GetComponent<RoomGenerator>().BuildRoom(prototypeRoom);
+            }
+        }
+
+        public override void OnStartClient()
+        {
+            UnityEngine.Random.InitState (seed);
+            Debug.Log(seed);
+            prototypeHouse = new PrototypeHouse(seed, houseSize);
+            foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
+            {
+                Debug.Log("Finding rooms...");
+                foreach(RoomGenerator roomGenerator in Object.FindObjectsOfType<RoomGenerator>())
+                {
+                    
+                    if(roomGenerator.roomPosition == prototypeRoom.GetPosition())
+                    {
+                        roomGenerator.BuildRoom(prototypeRoom);
+                    }
+                }
+            }
+
+            foreach(RoomGenerator roomGenerator in Object.FindObjectsOfType<RoomGenerator>())
+            {
+                roomGenerator.transform.parent = transform;
+            }
         }
 
         // Update is called once per frame
         void Update()
         {
-        }
-
-        public void Initialize()
-        {
-
-            prototypeHouse = new PrototypeHouse(seed, houseSize);
-
-            foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
-            {
-                GameObject room = (GameObject) GameObject.Instantiate(roomPrefab, transform);
-                room.GetComponent<RoomGenerator>().Initialize(prototypeRoom);
-            }
         }
     }
 }

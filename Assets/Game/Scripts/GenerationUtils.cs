@@ -8,13 +8,15 @@ namespace SoleHeir.GenerationUtils
 {
     public class PrototypeHouse
     {
-        private int seed;
+        public int seed;
 
-        private int houseSize;
+        public int houseSize;
 
-        private GenerationGrid<RoomType> statusGrid;
+        public GenerationGrid<RoomType> statusGrid;
 
-        private List<PrototypeRoom> rooms;
+        public List<PrototypeRoom> rooms;
+
+        public PrototypeHouse() {}
 
         public PrototypeHouse(int seed, int houseSize)
         {
@@ -68,8 +70,7 @@ namespace SoleHeir.GenerationUtils
                 }
 
                 //Pick a random edge and determine size.
-                Vector2Int edge =
-                    edges[UnityEngine.Random.Range(0, edges.Count - 1)];
+                Vector2Int edge = edges[UnityEngine.Random.Range(0, edges.Count)];
                 int minRange = 1;
                 int maxRange = 2 + houseSize / 100;
                 int rectLeft = UnityEngine.Random.Range(minRange, maxRange);
@@ -334,7 +335,7 @@ namespace SoleHeir.GenerationUtils
             if (list.Count > 0)
             {
                 Vector2Int vector =
-                    list[UnityEngine.Random.Range(0, list.Count - 1)];
+                    list[UnityEngine.Random.Range(0, list.Count)];
                 room =
                     new PrototypeRoom(RoomType.HALLWAY, location, vector, this);
                 return room;
@@ -352,7 +353,7 @@ namespace SoleHeir.GenerationUtils
             if (list.Count > 0)
             {
                 Vector2Int vector =
-                    list[UnityEngine.Random.Range(0, list.Count - 1)];
+                    list[UnityEngine.Random.Range(0, list.Count)];
                 room =
                     new PrototypeRoom(RoomType.LARGE, location, vector, this);
                 return room;
@@ -366,7 +367,7 @@ namespace SoleHeir.GenerationUtils
             if (list.Count > 0)
             {
                 Vector2Int vector =
-                    list[UnityEngine.Random.Range(0, list.Count - 1)];
+                    list[UnityEngine.Random.Range(0, list.Count)];
                 room =
                     new PrototypeRoom(RoomType.NORMAL, location, vector, this);
                 return room;
@@ -384,7 +385,7 @@ namespace SoleHeir.GenerationUtils
             if (list.Count > 0)
             {
                 Vector2Int vector =
-                    list[UnityEngine.Random.Range(0, list.Count - 1)];
+                    list[UnityEngine.Random.Range(0, list.Count)];
                 room = new PrototypeRoom(RoomType.LONG, location, vector, this);
                 return room;
             }
@@ -467,21 +468,25 @@ namespace SoleHeir.GenerationUtils
 
     public class PrototypeRoom
     {
-        RoomType roomType;
+        public RoomType roomType;
 
-        Vector2Int position;
+        public Vector2Int position;
 
-        Vector2Int size;
+        public Vector2Int size;
 
-        PrototypeHouse house;
+        public int seed;
 
-        private List<PrototypeDoorway> leftDoorways;
+        public PrototypeHouse house;
 
-        private List<PrototypeDoorway> topDoorways;
+        public List<PrototypeDoorway> leftDoorways;
 
-        private List<PrototypeDoorway> rightDoorways;
+        public List<PrototypeDoorway> topDoorways;
 
-        private List<PrototypeDoorway> bottomDoorways;
+        public List<PrototypeDoorway> rightDoorways;
+
+        public List<PrototypeDoorway> bottomDoorways;
+
+        public PrototypeRoom() {}
 
         public PrototypeRoom(
             RoomType roomType,
@@ -504,6 +509,7 @@ namespace SoleHeir.GenerationUtils
                 new Vector2Int(Math.Max(vector1.x, vector2.x),
                     Math.Max(vector1.y, vector2.y));
             size = size - position + new Vector2Int(1, 1);
+            this.seed = (int)UnityEngine.Random.Range(0,999999999);
 
             for (int i = position.x; i < position.x + size.x; i++)
             {
@@ -547,13 +553,18 @@ namespace SoleHeir.GenerationUtils
         {
             return size;
         }
+
+        public int GetSeed()
+        {
+            return seed;
+        }
     }
 
     public class PrototypeDoorway
     {
-        private PrototypeRoom room;
+        public PrototypeRoom room;
 
-        private Vector2Int position;
+        public Vector2Int position;
 
         public PrototypeDoorway other = null;
 
@@ -562,6 +573,8 @@ namespace SoleHeir.GenerationUtils
             this.room = room;
             this.position = position;
         }
+
+        public PrototypeDoorway() {}
 
         public PrototypeRoom GetRoom()
         {
@@ -576,15 +589,15 @@ namespace SoleHeir.GenerationUtils
 
     public class GenerationGrid<T>
     {
-        private GenerationPlane<GenerationPlane<T>> grid;
+        public GenerationPlane<GenerationPlane<T>> grid;
 
-        private int minX;
+        public int minX;
 
-        private int maxX;
+        public int maxX;
 
-        private int minY;
+        public int minY;
 
-        private int maxY;
+        public int maxY;
 
         public GenerationGrid()
         {
@@ -706,11 +719,11 @@ namespace SoleHeir.GenerationUtils
 
     public class GenerationPlane<T>
     {
-        private T[] array;
+        public T[] array;
 
-        private int min;
+        public int min;
 
-        private int max;
+        public int max;
 
         public GenerationPlane()
         {

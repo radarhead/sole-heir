@@ -302,6 +302,7 @@ namespace SoleHeir
 
             if(dodgeRollTimer > 0)
             {
+                transform.localScale= new Vector3(1,0.5f,1);
                 if(dodgeRollTimer > dodgeRollSlowDown + dodgeRollLag)
                 {
                     body.velocity = body.velocity.normalized * dodgeRollSpeed;
@@ -316,6 +317,8 @@ namespace SoleHeir
                 }
             }
             else {
+                transform.localScale= new Vector3(1,1,1);
+
                 // Only process inputs for local player.
                 if (isLocalPlayer)
                 {
