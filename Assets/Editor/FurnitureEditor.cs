@@ -12,8 +12,7 @@ namespace SoleHeir
         {
             Furniture t = target as Furniture;
             Vector3 pos = t.transform.position;
-
-
+            
             Handles
                 .DrawSolidRectangleWithOutline(new Vector3[] {
                     new Vector3(pos.x, pos.y, pos.z),

@@ -21,16 +21,16 @@ namespace SoleHeir
         public float dodgeRollLag;
 
         // Timers
-        float reloadTimer =0;
-        float rotationTimer =0;
-        [SyncVar] float dodgeRollTimer =0;
+        float reloadTimer = 0;
+        float rotationTimer = 0;
 
         public GameObject carryablePrefab;
         private Vector2 moveInput;
         private Vector3 acceleration = Vector3.zero;
         private Vector2 cameraPosition = Vector2.zero;
-        [SyncVar] Vector3 aimTarget;
-        [SyncVar] Quaternion rotation = Quaternion.identity;
+        Vector3 aimTarget;
+        Quaternion rotation = Quaternion.identity;
+        [SyncVar] public PlayerStatus status;
 
         Rigidbody body;
         private bool mouseAim = false;
@@ -38,15 +38,11 @@ namespace SoleHeir
         public GameObject gunPrefab;
         public GameObject bulletPrefab;
 
-        
-
-        //readonly SyncList<GameObject> inventory = new SyncList<GameObject>();
-        [SyncVar]
-        public int carriedItem = 0;
+        [SyncVar]  public int carriedItem = 0;
 
         // Start is called before the first frame update
-        void Start()
-        {
+        public override void OnStartClient()
+        { 
             transform.parent = PlayerManager.instance.transform;
 
             body = GetComponent<Rigidbody>();
@@ -61,14 +57,9 @@ namespace SoleHeir
 
             if(isLocalPlayer)
             {
+                GetComponent<PlayerInput>().enabled = true;
                 CmdSetGun();
             }
-        }
-
-        [Command]
-        void CmdSetRotation(Quaternion rotation)
-        {
-            this.rotation = rotation;
         }
 
         [Command]
@@ -87,138 +78,103 @@ namespace SoleHeir
 
         public void OnMove(InputValue value)
         {
-            if(isLocalPlayer)
+            moveInput = value.Get<Vector2>();
+        }
+
+        public void OnInteract(InputValue value)
+        {
+            // If the interaction is starting
+            if (value.Get<float>() > 0)
             {
-                moveInput = value.Get<Vector2>();
+                InteractableComponent ic = GetNearestInteractable();
+                if(ic != null && ic.status == InteractionStatus.FREE)
+                {
+                    CmdStartInteraction(ic.netIdentity);
+                }
+            }
+            else
+            {
+                CmdEndInteraction();
             }
         }
 
-
-
         public void OnPoint(InputValue value)
         {
-            if(isLocalPlayer)
-            {
-                mousePos = value.Get<Vector2>();
-                mouseAim = true;
-                rotationTimer = rotationTime;
-            }
+            mousePos = value.Get<Vector2>();
+            mouseAim = true;
+            rotationTimer = rotationTime;
         }
 
         public void OnThrow(InputValue value)
         {
-            if(isLocalPlayer)
+            if(value.Get<float>() < 1f) return;
+
+            if(HeldItem() != null)
             {
-                if(value.Get<float>() < 1f) return;
+                CmdThrowItem(aimTarget);
+            }
 
-                if(HeldItem() != null)
-                {
-                    CmdThrowItem(aimTarget);
-                }
-
-                else
-                {
-                    CmdPickupItem();
-                }
-                
+            else
+            {
+                CmdPickupItem();
             }
         }
 
         public void OnScroll(InputValue value)
         {
-            if(isLocalPlayer)
+            if(value.Get<Vector2>().y >= 120)
             {
-                if(value.Get<Vector2>().y >= 120)
-                {
-                    CmdSetCarriedItem((carriedItem+1)%4);
-                }
-                else if(value.Get<Vector2>().y <= -120)
-                {
-                    CmdSetCarriedItem((carriedItem+3)%4);
-                }
+                CmdSetCarriedItem((carriedItem+1)%4);
+            }
+            else if(value.Get<Vector2>().y <= -120)
+            {
+                CmdSetCarriedItem((carriedItem+3)%4);
             }
         }
 
         public void OnAim(InputValue value)
         {
-            if(isLocalPlayer)
+            if(value.Get<Vector2>().magnitude > 0)
             {
-                if(value.Get<Vector2>().magnitude > 0)
-                {
-                    aimTarget = (new Vector3(value.Get<Vector2>().x, 0, value.Get<Vector2>().y));
-                    mouseAim = false;
-                    rotationTimer = rotationTime;
-                }
-
+                aimTarget = (new Vector3(value.Get<Vector2>().x, 0, value.Get<Vector2>().y));
+                mouseAim = false;
+                rotationTimer = rotationTime;
             }
         }
 
         public void OnFire(InputValue value)
         {
-            if(isLocalPlayer)
+            if(status != PlayerStatus.FREE) return;
+            if(value.Get<float>() < 1f) return;
+            if(reloadTimer == 0)
             {
-                if(value.Get<float>() < 1f) return;
-                if(reloadTimer == 0)
+                if(HeldItem() != null && HeldItem().GetComponent<Carryable>().type == CarryableType.GUN)
                 {
-                    if(HeldItem() != null && HeldItem().GetComponent<Carryable>().type == CarryableType.GUN)
-                    {
-                        CameraController.instance.SetScreenShake(1f);
-                        CmdShootGun(aimTarget);
-                        reloadTimer = 0.3f;
-                    }
+                    CameraController.instance.SetScreenShake(1f);
+                    CmdShootGun(aimTarget);
+                    reloadTimer = 0.3f;
                 }
-            }
-        }
-
-        public void OnDodgeRoll(InputValue value)
-        {
-            if(isLocalPlayer)
-            {
-                if(body.velocity.magnitude > 0)
-                {
-                    CmdDodgeRoll();
-                }
-            }
-        }
-
-        public void CmdDodgeRoll()
-        {
-            if(body.velocity.magnitude > 0)
-            {
-                dodgeRollTimer = dodgeRollTime + dodgeRollSlowDown + dodgeRollLag;
             }
         }
 
         public void OnItemOne(InputValue value)
         {
-            if(isLocalPlayer)
-            {
-                CmdSetCarriedItem(0);
-            }
+            CmdSetCarriedItem(0);
         }
 
         public void OnItemTwo(InputValue value)
         {
-            if(isLocalPlayer)
-            {
-                CmdSetCarriedItem(1);
-            }
+            CmdSetCarriedItem(1);
         }
 
         public void OnItemThree(InputValue value)
         {
-            if(isLocalPlayer)
-            {
-                CmdSetCarriedItem(2);
-            }
+            CmdSetCarriedItem(2);
         }
 
         public void OnItemFour(InputValue value)
         {
-            if(isLocalPlayer)
-            {
-                CmdSetCarriedItem(3);
-            }
+            CmdSetCarriedItem(3);
         }
 
         [Command]
@@ -264,6 +220,20 @@ namespace SoleHeir
         }
 
         [Command]
+        public void CmdStartInteraction(NetworkIdentity ic)
+        {
+            status = PlayerStatus.INTERACTING;
+            body.velocity = new Vector3(0,0,0);
+            ic.GetComponent<InteractableComponent>().Interact(netIdentity);
+        }
+
+        [Command]
+        public void CmdEndInteraction()
+        {
+            status = PlayerStatus.FREE;
+        }
+
+        [Command]
         void CmdShootGun(Vector3 aimTarget)
         {
             if(reloadTimer==0)
@@ -279,52 +249,27 @@ namespace SoleHeir
             }
         }
 
-        void OnCollisionEnter(Collision collision)
-        {
-            if(isLocalPlayer)
-            {
-                if(dodgeRollTimer > 0)
-                {
-                    dodgeRollTimer = dodgeRollLag;
-
-                    CameraController.instance.SetScreenShake(0.5f);
-                }
-            }
-
-        }
-
         // Update is called once per frame
         void Update()
         {
             reloadTimer = Math.Max(0f, reloadTimer - Time.deltaTime);
             rotationTimer = Math.Max(0f, rotationTimer - Time.deltaTime);
-            dodgeRollTimer = Math.Max(0f, dodgeRollTimer - Time.deltaTime);
 
-            if(dodgeRollTimer > 0)
+            // Handle all movement code
+            if(isLocalPlayer)
             {
-                transform.localScale= new Vector3(1,0.5f,1);
-                if(dodgeRollTimer > dodgeRollSlowDown + dodgeRollLag)
+                InteractableComponent ic = GetNearestInteractable();
+                if(ic!=null)
                 {
-                    body.velocity = body.velocity.normalized * dodgeRollSpeed;
+                    ic.interactableDisplay.GetComponent<Animator>().SetBool("open", true);
+                    ic.displayHideTimer = 0.05f;
                 }
-                else if(dodgeRollTimer > dodgeRollLag)
+                // If the player can walk around.
+                if(status == PlayerStatus.FREE)
                 {
-                    body.velocity = body.velocity.normalized * (dodgeRollSpeed * ((dodgeRollTimer - dodgeRollLag) / dodgeRollSlowDown));
-                }
-                else
-                {
-                    body.velocity = Vector3.zero;
-                }
-            }
-            else {
-                transform.localScale= new Vector3(1,1,1);
-
-                // Only process inputs for local player.
-                if (isLocalPlayer)
-                {
+                    // Point to the camera
                     if(mouseAim)
                     {
-                        // Point to the camera
                         Plane plane = new Plane(Vector3.up, 0);
 
                         float distance;
@@ -336,33 +281,71 @@ namespace SoleHeir
                             
                         }
                     }
+
                     body.velocity = Vector3.SmoothDamp(body.velocity, new Vector3(moveInput.x, 0, moveInput.y)*speed, ref acceleration, smoothTime);
 
                     if(rotationTimer > 0) 
                     {
-                        transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(aimTarget), Time.deltaTime * rotationSpeed);
-                        CmdSetRotation(transform.rotation);
+                        body.rotation = Quaternion.Lerp(body.rotation, Quaternion.LookRotation(aimTarget), Time.deltaTime * rotationSpeed);
                     }
                     else 
                     {
                         if(body.velocity.magnitude > 0.2)
                         {
-                            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(body.velocity.x, 0, body.velocity.z)), Time.deltaTime * rotationSpeed);
-                            CmdSetRotation(transform.rotation);
+                            body.rotation = Quaternion.Lerp(body.rotation, Quaternion.LookRotation(new Vector3(body.velocity.x, 0, body.velocity.z)), Time.deltaTime * rotationSpeed);
                         }
                     }
-
-                } else {
-                    transform.rotation = rotation;
                 }
 
-                if(HeldItem() != null)
+                else if(status == PlayerStatus.INTERACTING)
                 {
-                    HeldItem().transform.localPosition = new Vector3(0,1,1);
-                    HeldItem().transform.localRotation = Quaternion.identity;
+                    if(ic != null)
+                    {
+                        body.velocity = new Vector3(0,0,0);
+                        body.rotation = Quaternion.Lerp(body.rotation, Quaternion.LookRotation(ic.GetCenter() - body.position), Time.deltaTime * rotationSpeed);
+                    }
                 }
             }
 
+            if(HeldItem() != null)
+            {
+                HeldItem().transform.localPosition = new Vector3(0,1,1);
+                HeldItem().transform.localRotation = Quaternion.identity;
+            }
+        }
+
+        InteractableComponent GetNearestInteractable()
+        {
+            InteractableComponent nearest = null;
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5);
+            foreach (Collider hitCollider in hitColliders)
+            {
+                FurnitureController f = hitCollider.GetComponentInParent<FurnitureController>();
+                if(f != null)
+                {
+                    InteractableComponent ic = f.GetComponentInChildren<InteractableComponent>();
+                    if(ic != null && hitCollider.GetComponentInParent<PlayerController>() == null)
+                    {
+                        float playerDistance = ic.GetDistanceToPlayer(netIdentity);
+                        if(playerDistance < ic.config.interactionDistance)
+                        {
+                            if(nearest == null)
+                            {
+                                nearest = ic;
+                            }
+                            else
+                            {
+                                if(playerDistance < nearest.GetDistanceToPlayer(netIdentity))
+                                {
+                                    nearest = ic;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+            return nearest;
         }
 
         GameObject HeldItem()

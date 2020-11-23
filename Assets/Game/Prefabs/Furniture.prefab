@@ -66,6 +66,9 @@ MonoBehaviour:
   resourcesIndex: 0
   spawnerPrefab: {fileID: 8612332323232293630, guid: 38742636aa2778249ac0cdb1466ec5b0,
     type: 3}
+  interactorPrefab: {fileID: 2832857116542377447, guid: 8af554a099aa76141833928c5102862e,
+    type: 3}
+  room: {fileID: 0}
 --- !u!114 &364341488900337956
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7,19 +7,20 @@ namespace SoleHeir
 {
     public class FurnitureController : NetworkBehaviour
     {
-        [SyncVar]
-        public int resourcesIndex;
+        [SyncVar] public int resourcesIndex;
         public GameObject spawnerPrefab;
-        [SyncVar]
-        public uint roomId;
+        public GameObject interactorPrefab;
+        [SyncVar] public NetworkIdentity room;
 
-        public override void OnStartClient()
+        /*public override void OnStartServer()
         {
-            if (NetworkIdentity.spawned.TryGetValue(roomId, out NetworkIdentity identity))
-            {
-                transform.parent = identity.gameObject.transform;
-            }
-            
+
+        }*/
+
+        void Start()
+        {
+            transform.parent = room.gameObject.transform;
+
             GameObject child = null;
             if(resourcesIndex < 0)
             {
@@ -32,14 +33,22 @@ namespace SoleHeir
 
             child.transform.position = transform.position;
             child.transform.rotation = transform.rotation;
-            //child.transform.localScale = transform.scale;
+
+            if(isServer)
+            {
+                if(GetComponentInChildren<InteractableConfig>())
+                {
+                    GameObject interactor = Instantiate(interactorPrefab, transform.position, transform.rotation);
+                    interactor.GetComponent<InteractableComponent>().furniture = netIdentity;
+                    NetworkServer.Spawn(interactor);
+                }
+            }
         }
 
         // Update is called once per frame
         void Update()
         {
 
-            
         }
     }
 }

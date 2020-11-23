@@ -18,7 +18,7 @@ namespace SoleHeir
         // Start is called before the first frame update
         void Start()
         {
-            
+
         }
 
         public override void OnStartServer()
@@ -43,11 +43,9 @@ namespace SoleHeir
         public override void OnStartClient()
         {
             UnityEngine.Random.InitState (seed);
-            Debug.Log(seed);
             prototypeHouse = new PrototypeHouse(seed, houseSize);
             foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
             {
-                Debug.Log("Finding rooms...");
                 foreach(RoomGenerator roomGenerator in Object.FindObjectsOfType<RoomGenerator>())
                 {
                     

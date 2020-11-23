@@ -24,7 +24,7 @@ namespace SoleHeir
                     GameObject newChild = GameObject.Instantiate(fade, transform);
                     //newChild.transform.localScale = fade.transform.localScale;
                     newChild.transform.parent = transform;
-                    newChild.transform.GetChild(0).GetComponent<MeshRenderer>().material.color = new Color(0.0f, 0.0f, 0.0f, opacity*opacity);
+                    newChild.transform.GetChild(0).GetComponent<MeshRenderer>().material.SetColor("_BaseColor", new Color(0.0f, 0.0f, 0.0f, opacity*opacity));
                     newChild.transform.localPosition += new Vector3(0,0,z);
                 }
 

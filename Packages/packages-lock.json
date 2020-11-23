@@ -112,13 +112,15 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
-<<<<<<< HEAD
+
     "com.unity.subsystemregistration": {
       "version": "1.0.6",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
-=======
+      "url": "https://packages.unity.com"
+    },
+
     "com.unity.render-pipelines.core": {
       "version": "7.3.1",
       "depth": 1,
@@ -145,7 +147,6 @@
       "dependencies": {
         "com.unity.render-pipelines.core": "7.3.1"
       },
->>>>>>> 9961930f19c92ae75e6d1081fe61d913bc43efeb
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {

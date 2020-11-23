@@ -1,8 +1,15 @@
 ﻿namespace SoleHeir
 {
-    public enum PlayerState
+    public enum PlayerStatus
     {
-        WALKING,
+        FREE,
         INTERACTING 
+    }
+
+    public enum InteractionStatus
+    {
+        FREE,
+        INTERACTING,
+        INTERACTING_HOLD
     }
 }

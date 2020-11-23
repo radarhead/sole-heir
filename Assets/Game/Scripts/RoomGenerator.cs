@@ -353,7 +353,7 @@ namespace SoleHeir
             Furniture furniture = furnitureObject.GetComponent<Furniture>();
             GameObject furnitureParent = Instantiate(furniturePrefab, transform) as GameObject;
             furnitureParent.GetComponent<FurnitureController>().resourcesIndex = index;
-            furnitureParent.GetComponent<FurnitureController>().roomId = netId;
+            furnitureParent.GetComponent<FurnitureController>().room = netIdentity;
             NetworkServer.Spawn(furnitureParent);
             if(spaceType == SpaceType.ROOM_OPEN)
             {
@@ -509,7 +509,7 @@ namespace SoleHeir
             foreach (Component b in a)
             {
                 Renderer c = (Renderer)b;
-                c.material.color = new Color(0,0,0, transparency);
+                c.material.SetColor("_BaseColor", new Color(0,0,0, transparency));
             }
         }
 

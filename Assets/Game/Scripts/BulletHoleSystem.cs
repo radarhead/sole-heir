@@ -40,7 +40,7 @@ namespace SoleHeir
         {
             if(contact.otherCollider.GetComponentInParent<WallGenerator>() != null)
             {
-                GameObject bulletHole = Instantiate(bulletHolePrefab, contact.point + new Vector3(0, UnityEngine.Random.Range(-0.2f, 0.2f),0), Quaternion.LookRotation(contact.normal));
+                GameObject bulletHole = Instantiate(bulletHolePrefab, contact.point + new Vector3(contact.normal.x/10, UnityEngine.Random.Range(-0.2f, 0.2f),contact.normal.z/10), Quaternion.LookRotation(contact.normal));
                 bulletHole.transform.parent = transform;
                 NetworkServer.Spawn(bulletHole);
             }
