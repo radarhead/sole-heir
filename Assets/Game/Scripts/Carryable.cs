@@ -9,18 +9,11 @@ namespace SoleHeir
     {
         public GameObject prefab;
         private GameObject entity;
-        [SyncVar]
-        public CarryableState state;
-        [SyncVar]
-        public CarryableType type;
-        [SyncVar]
-        public string entityName;
-        [SyncVar]
-        private bool isChanged = false;
-        [SyncVar]
-        public int inventorySpace;
-        [SyncVar]
-        public float ownerId;
+        [SyncVar] public CarryableType type;
+        [SyncVar] public string entityName;
+        [SyncVar] private bool isChanged = false;
+        [SyncVar] public int inventorySpace;
+        [SyncVar] public NetworkIdentity owner;
 
         // Start is called before the first frame update
         void Start()
@@ -28,13 +21,6 @@ namespace SoleHeir
             if(entity == null) LoadEntity();
         }
 
-        public void SetState(CarryableState state)
-        {
-            this.state = state;
-            StateChange();
-        }
-
-        public CarryableState GetState() {return state;}
         public CarryableType GetType() {return type;}
         public string GetEntityName() {return entityName;}
 
@@ -43,21 +29,16 @@ namespace SoleHeir
             this.type=type;
             isChanged = true;
         }
-
-        public void SetOwnerId(float ownerId)
-        {
-            this.ownerId = ownerId;
-        }
-
         public void SetEntityName(string entityName)
         {
             this.entityName = entityName;
             isChanged = true;
         }
 
-        public void SetInventorySpace(int inventorySpace)
+        public void AddToInventory(InventoryComponent inventoryComponent, int index)
         {
-            this.inventorySpace = inventorySpace;
+            this.inventorySpace = index;
+            this.owner = inventoryComponent.netIdentity;
         }
 
         // Update is called once per frame
@@ -69,39 +50,49 @@ namespace SoleHeir
             }
 
             StateChange();
-                
         }
 
+        public void Spawn(Vector3 force)
+        {
+            this.owner = null;
+            entity.SetActive(true);
+            gameObject.GetComponent<Rigidbody>().detectCollisions = true;
+            this.inventorySpace = 0;
+            transform.parent = CarryableManager.instance.transform;
+            GetComponent<Rigidbody>().AddForce(force, ForceMode.Impulse);
+        }
+
+        // Ensures that the item has the correct parent
         void StateChange()
         {
             if(entity != null)
             {
-                switch(state)
+                // If the item is in an inventory
+                if(owner != null)
                 {
-                    case CarryableState.INVENTORY:
-                        entity.SetActive(false);
-                        break;
-                    case CarryableState.SPAWNED:
-                        entity.SetActive(true);
-                        gameObject.GetComponent<Rigidbody>().isKinematic = false;
-                        gameObject.GetComponent<Rigidbody>().detectCollisions = true;
-                        this.ownerId = 0;
-                        this.inventorySpace = 0;
-                        transform.parent = CarryableManager.instance.transform;
-                        break;
-                    case CarryableState.CARRIED:
-                        entity.SetActive(true);
-                        gameObject.GetComponent<Rigidbody>().isKinematic = true;
+                    // If the item is being carried by a player
+                    if(owner.GetComponent<PlayerController>() && owner.GetComponent<PlayerController>().carriedItem == inventorySpace)
+                    {
+                        //gameObject.GetComponent<Rigidbody>().isKinematic = true;
                         gameObject.GetComponent<Rigidbody>().detectCollisions = false;
-                        foreach (PlayerController pc in PlayerManager.instance.GetComponentsInChildren<PlayerController>())
-                        {
-                            if(pc.netId==ownerId)
-                            {
-                                transform.parent = pc.transform;
-                            }
-                        }
-                        break;
+                        entity.SetActive(true);
+                        transform.parent = owner.transform;
+                    }
+                    else
+                    {
+                        entity.SetActive(false);
+                        transform.parent = owner.transform;
+                    }
                 }
+                // If the item is spawned
+                else
+                {
+                    entity.SetActive(true);
+                    gameObject.GetComponent<Rigidbody>().detectCollisions = true;
+                    this.inventorySpace = 0;
+                    transform.parent = CarryableManager.instance.transform;
+                }
+                        
             }
         }
 
@@ -111,10 +102,18 @@ namespace SoleHeir
             {
                 //Destroy the old one, yeh yeh
             }
+            
+            if(type == CarryableType.BODY)
+            {
+                entity = Resources.Load("Carryables/Bodies/"+entityName) as GameObject;
+                gameObject.GetComponent<Rigidbody>().mass = 100;
+            }
+
 
             if(type == CarryableType.GUN)
             {
                 entity = Resources.Load("Carryables/Guns/"+entityName) as GameObject;
+                gameObject.GetComponent<Rigidbody>().mass = 5;
             }
 
             if(entity != null)
@@ -123,15 +122,6 @@ namespace SoleHeir
             }
             isChanged = false;
         }
-    }
-
-
-
-    public enum CarryableState
-    {
-        INVENTORY,
-        SPAWNED,
-        CARRIED
     }
 
     public enum CarryableType

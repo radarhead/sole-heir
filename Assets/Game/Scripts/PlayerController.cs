@@ -7,7 +7,7 @@ using System;
 
 namespace SoleHeir
 {
-    public class PlayerController : NetworkBehaviour
+    public class PlayerController : NetworkBehaviour, KillableInterface
     {
         // Config
         public float speed;
@@ -31,6 +31,7 @@ namespace SoleHeir
         Vector3 aimTarget;
         Quaternion rotation = Quaternion.identity;
         [SyncVar] public PlayerStatus status;
+        [SyncVar] public GameObject playerIdentity;
 
         Rigidbody body;
         private bool mouseAim = false;
@@ -46,12 +47,12 @@ namespace SoleHeir
             transform.parent = PlayerManager.instance.transform;
 
             body = GetComponent<Rigidbody>();
-            UnityEngine.Object[] spawners = GameObject.FindGameObjectsWithTag("SpawnLocation");
+            /*UnityEngine.Object[] spawners = GameObject.FindGameObjectsWithTag("SpawnLocation");
             if(spawners.Length > 0)
             {
                 GameObject spawner = spawners[UnityEngine.Random.Range(0, spawners.Length)] as GameObject;
                 this.transform.position = spawner.transform.position + new Vector3(1,0,1);
-            }
+            }*/
 
             //heldItem = transform.Find("Gun").gameObject;
 
@@ -67,11 +68,9 @@ namespace SoleHeir
         {
             GameObject gun = Instantiate(carryablePrefab, Vector3.zero, Quaternion.identity);
             NetworkServer.Spawn(gun);
-            gun.GetComponent<Carryable>().SetOwnerId(netId);
             gun.GetComponent<Carryable>().SetType(CarryableType.GUN);
-            gun.GetComponent<Carryable>().SetState(CarryableState.CARRIED);
             gun.GetComponent<Carryable>().SetEntityName("Pistol");
-            gun.GetComponent<Carryable>().SetInventorySpace(0);
+            gun.GetComponent<Carryable>().AddToInventory(GetComponent<InventoryComponent>(), 0);
             carriedItem = 0;
             //inventory.Add(gun);
         }
@@ -83,6 +82,7 @@ namespace SoleHeir
 
         public void OnInteract(InputValue value)
         {
+            if(!IsAlive()) return;
             // If the interaction is starting
             if (value.Get<float>() > 0)
             {
@@ -107,6 +107,7 @@ namespace SoleHeir
 
         public void OnThrow(InputValue value)
         {
+            if(!IsAlive()) return;
             if(value.Get<float>() < 1f) return;
 
             if(HeldItem() != null)
@@ -146,9 +147,11 @@ namespace SoleHeir
         {
             if(status != PlayerStatus.FREE) return;
             if(value.Get<float>() < 1f) return;
-            if(reloadTimer == 0)
+            
+            if (reloadTimer == 0)
             {
-                if(HeldItem() != null && HeldItem().GetComponent<Carryable>().type == CarryableType.GUN)
+                Carryable heldItem = HeldItem();
+                if (heldItem != null && heldItem.type == CarryableType.GUN)
                 {
                     CameraController.instance.SetScreenShake(1f);
                     CmdShootGun(aimTarget);
@@ -180,26 +183,20 @@ namespace SoleHeir
         [Command]
         void CmdSetCarriedItem(int carriedItem)
         {
-            GameObject oldItem = HeldItem();
-            if(oldItem != null)
-            {
-                oldItem.GetComponent<Carryable>().SetState(CarryableState.INVENTORY);
-            }
+            Carryable oldItem = HeldItem();
 
-            this.carriedItem = carriedItem;
-            GameObject newItem = HeldItem();
-            if(newItem != null)
+            if(oldItem != null && oldItem.GetComponent<Carryable>().type == CarryableType.BODY)
             {
-                newItem.GetComponent<Carryable>().SetState(CarryableState.CARRIED);
+                return;
             }
+            this.carriedItem = carriedItem;
         }
 
         [Command]
         void CmdThrowItem(Vector3 aimTarget)
         {
-            Carryable item = HeldItem().GetComponent<Carryable>();
-            item.SetState(CarryableState.SPAWNED);
-            item.GetComponent<Rigidbody>().velocity = body.velocity + Quaternion.LookRotation(aimTarget)*new Vector3(0,0,20);
+            Carryable item = HeldItem();
+            item.Spawn(Quaternion.LookRotation(aimTarget)*new Vector3(0,0,50));
         }
 
         [Command]
@@ -211,9 +208,7 @@ namespace SoleHeir
                 if(c.attachedRigidbody != null && c.attachedRigidbody.gameObject.GetComponentInParent<Carryable>())
                 {
                     Carryable item = c.attachedRigidbody.gameObject.GetComponentInParent<Carryable>();
-                    item.SetInventorySpace(carriedItem);
-                    item.SetOwnerId(netId);
-                    item.SetState(CarryableState.CARRIED);
+                    item.AddToInventory(GetComponent<InventoryComponent>(), carriedItem);
                     return;
                 }
             }
@@ -242,6 +237,10 @@ namespace SoleHeir
                 body.rotation = Quaternion.LookRotation(aimTarget);
                 transform.GetComponent<Rigidbody>().AddForce(Quaternion.LookRotation(aimTarget) * new Vector3(0,0,-200));
                 GameObject bullet = Instantiate(bulletPrefab, transform.position +new Vector3(0,1,0), Quaternion.LookRotation(aimTarget));
+                BulletController controller = bullet.GetComponentInChildren<BulletController>();
+                GunConfig config = HeldItem().GetComponentInChildren<GunConfig>();
+                controller.damage = config.damage;
+                controller.playerIdentity = playerIdentity;
                 Physics.IgnoreCollision(bullet.GetComponent<Collider>(), gameObject.GetComponentInChildren<Collider>());
                 bullet.GetComponent<Rigidbody>().velocity = Quaternion.LookRotation(aimTarget) * new Vector3(0,0,80);
                 reloadTimer = 0.3f;
@@ -254,12 +253,26 @@ namespace SoleHeir
         {
             reloadTimer = Math.Max(0f, reloadTimer - Time.deltaTime);
             rotationTimer = Math.Max(0f, rotationTimer - Time.deltaTime);
+            bool alive = IsAlive();
+
+            if(!alive)
+            {
+                transform.Find("Capsule").gameObject.layer = 12;
+                if(!isLocalPlayer)
+                {
+                    foreach(Renderer r in GetComponentsInChildren<Renderer>())
+                    {
+                        r.enabled = false;
+                    }
+                }
+            }
 
             // Handle all movement code
             if(isLocalPlayer)
             {
                 InteractableComponent ic = GetNearestInteractable();
-                if(ic!=null)
+                Carryable heldItem = HeldItem();
+                if(ic!=null && alive && !(heldItem != null && heldItem.type == CarryableType.BODY))
                 {
                     ic.interactableDisplay.GetComponent<Animator>().SetBool("open", true);
                     ic.displayHideTimer = 0.05f;
@@ -282,8 +295,10 @@ namespace SoleHeir
                         }
                     }
 
-                    body.velocity = Vector3.SmoothDamp(body.velocity, new Vector3(moveInput.x, 0, moveInput.y)*speed, ref acceleration, smoothTime);
-
+                    float speedMod = 1;
+                    if(heldItem != null && heldItem.GetComponent<Carryable>().type == CarryableType.BODY) speedMod = 0.3f;
+                    Vector3 newVelocity = Vector3.SmoothDamp(body.velocity, new Vector3(moveInput.x, 0, moveInput.y)*speed*speedMod, ref acceleration, smoothTime);
+                    body.velocity = new Vector3(newVelocity.x, body.velocity.y, newVelocity.z);
                     if(rotationTimer > 0) 
                     {
                         body.rotation = Quaternion.Lerp(body.rotation, Quaternion.LookRotation(aimTarget), Time.deltaTime * rotationSpeed);
@@ -313,6 +328,23 @@ namespace SoleHeir
                 HeldItem().transform.localRotation = Quaternion.identity;
             }
         }
+
+        public void KillMe()
+        {
+            transform.Find("Capsule").gameObject.layer = 12;
+            foreach(Carryable c in GetComponentsInChildren<Carryable>())
+            {
+                c.GetComponent<Rigidbody>().position= body.position;
+                c.Spawn(body.velocity + Quaternion.LookRotation(aimTarget)*new Vector3(0,5,2));
+            }
+        }
+
+        public bool IsAlive()
+        {
+            return GetComponent<KillableComponent>().alive;
+        }
+
+        
 
         InteractableComponent GetNearestInteractable()
         {
@@ -348,16 +380,9 @@ namespace SoleHeir
             return nearest;
         }
 
-        GameObject HeldItem()
+        public Carryable HeldItem()
         {
-            foreach(Carryable c in gameObject.GetComponentsInChildren<Carryable>())
-            {
-                if(c.inventorySpace == carriedItem)
-                {
-                    return c.gameObject;
-                }
-            }
-            return null;
+            return GetComponent<InventoryComponent>().Get(carriedItem);
         }
     }
 }

@@ -474,6 +474,7 @@ MonoBehaviour:
   - {fileID: 731156171873271158, guid: c4ee03db0679d7944b91900ac5403e83, type: 3}
   - {fileID: 413115566823792527, guid: 4debba821642ba540a14b0f4d2885f11, type: 3}
   - {fileID: 2832857116542377447, guid: 8af554a099aa76141833928c5102862e, type: 3}
+  - {fileID: 8612332323232293630, guid: 38742636aa2778249ac0cdb1466ec5b0, type: 3}
 --- !u!4 &610456793
 Transform:
   m_ObjectHideFlags: 0
@@ -598,7 +599,6 @@ GameObject:
   m_Component:
   - component: {fileID: 900612963}
   - component: {fileID: 900612962}
-  - component: {fileID: 900612965}
   - component: {fileID: 900612964}
   m_Layer: 0
   m_Name: Game Logic
@@ -649,18 +649,6 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
---- !u!114 &900612965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 900612961}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 699e92b19bc66344abdeb761fb4e923b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &987537248
 GameObject:
   m_ObjectHideFlags: 0
@@ -848,7 +836,9 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   seed: 696
-  houseSize: 50
+  houseSize: 30
+  npcPrefab: {fileID: 1374428744767992272, guid: 4532266c1f4e9c44fab3e4eca03539af,
+    type: 3}
   roomPrefab: {fileID: 731156171873271158, guid: c4ee03db0679d7944b91900ac5403e83,
     type: 3}
 --- !u!114 &1438452534

@@ -44,11 +44,24 @@ namespace SoleHeir
                 normals = new List<Vector3>();
                 uv = new List<Vector2>();
                 tris =new List<int>();
-
                 
-                meshFilter = gameObject.AddComponent<MeshFilter>();
-                meshCollider = gameObject.AddComponent<MeshCollider>();
+                meshFilter = gameObject.GetComponent<MeshFilter>();
+                meshCollider = gameObject.GetComponent<MeshCollider>();
+
+                if(meshFilter == null)
+                {
+                    meshFilter = gameObject.AddComponent<MeshFilter>();
+                }
+
+                if(meshCollider == null)
+                {
+                    meshCollider = gameObject.AddComponent<MeshCollider>();
+                }
             }
+
+            
+
+
             Mesh mesh = new Mesh();
             int count = vertices.Count;
 

@@ -30,7 +30,7 @@ namespace SoleHeir
         private int gridSpacing = 1;
 
         public Texture2D wallTexture;
-        private bool enabled = true;
+        private bool isLocalRoom = true;
         private float alpha = 0.0f;
         public float velocity = 3.0f;
 
@@ -46,6 +46,8 @@ namespace SoleHeir
             ySize = prototypeRoom.GetSize().y*(roomHeight+roomSpacing)-roomSpacing;
             UnityEngine.Random.InitState(prototypeRoom.GetSeed());
 
+            transform.position = new Vector3(prototypeRoom.GetPosition().x*(roomWidth+roomSpacing),0,prototypeRoom.GetPosition().y*(roomHeight+roomSpacing));
+            
             GameObject floor = transform.Find("Floor").gameObject;
             floor.GetComponent<FloorGenerator>().Initialize(prototypeRoom, roomWidth, roomHeight, roomSpacing);
 
@@ -122,7 +124,7 @@ namespace SoleHeir
             frontFront.transform.localRotation = Quaternion.Euler(-90,0,0);
             frontFront.transform.localPosition = new Vector3(0,0,-roomSpacing/2);
 
-            transform.position = new Vector3(prototypeRoom.GetPosition().x*(roomWidth+roomSpacing),0,prototypeRoom.GetPosition().y*(roomHeight+roomSpacing));
+            
 
             bottomLeft = transform.position;
             topRight = bottomLeft + new Vector3(xSize,0,ySize);
@@ -146,7 +148,7 @@ namespace SoleHeir
         void Update()
         {
             
-            if(!enabled)
+            if(!isLocalRoom)
             {
                 alpha += velocity * Time.deltaTime;
                 if(alpha>1.0f) alpha = 1.0f;
@@ -178,12 +180,15 @@ namespace SoleHeir
 
         public void SetEnabled(bool enabled)
         {
-            this.enabled = enabled;
+            this.isLocalRoom = enabled;
         }
 
         public void InitializeGrid()
         {
             UnityEngine.Random.InitState (prototypeRoom.GetSeed());
+            
+            transform.position = new Vector3(prototypeRoom.GetPosition().x*(roomWidth+roomSpacing),0,prototypeRoom.GetPosition().y*(roomHeight+roomSpacing));
+
             roomGrid = new GenerationGrid<SpaceType>();
             xSize = prototypeRoom.GetSize().x*(roomWidth+roomSpacing)-roomSpacing;
             ySize = prototypeRoom.GetSize().y*(roomHeight+roomSpacing)-roomSpacing;
@@ -296,7 +301,7 @@ namespace SoleHeir
             {
                 for(int y=0; y<=roomGrid.GetMaxY(); y++)
                 {
-                    if(CheckFurniturePlacement(spawnerPrefab, new Vector2Int(x,y)))
+                    if(roomGrid.Get(x,y) == SpaceType.ROOM_OPEN)
                     {
                         availableSpaces.Add(new Vector2Int(x,y));
                     }
@@ -306,7 +311,9 @@ namespace SoleHeir
             if(availableSpaces.Count > 0)
             {
                 Vector2Int randomPosition = availableSpaces[UnityEngine.Random.Range(0, availableSpaces.Count - 1)];
-                PlaceFurniture(spawnerPrefab, randomPosition, -1);
+                GameObject spawner = Instantiate(spawnerPrefab, transform);
+                spawner.transform.localPosition = new Vector3(randomPosition.x, 0,randomPosition.y+gridSize)/gridSize;
+                NetworkServer.Spawn(spawner);
             }
         }
 
@@ -424,8 +431,8 @@ namespace SoleHeir
             {
                 if(furniture.type != FurnitureType.CENTER) return false;
                 return (roomGrid.CountRange(
-                    position + FloorVec(0,-GetModifiedHeight(furniture)) + offset1 - FloorVec(3,3)*gridSize,
-                    position + FloorVec(GetModifiedWidth(furniture), 0) + offset2 + FloorVec(3,3)*gridSize,
+                    position + FloorVec(0,-GetModifiedHeight(furniture)) + offset1 - FloorVec(2,2)*gridSize,
+                    position + FloorVec(GetModifiedWidth(furniture), 0) + offset2 + FloorVec(2,2)*gridSize,
                     SpaceType.ROOM_FILLED) == 0);
             }
             else if(spaceType == SpaceType.ROOM_WALL_TOP)

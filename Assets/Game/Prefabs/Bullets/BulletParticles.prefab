@@ -51,6 +51,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   isAlive: 1
+  bullet: {fileID: 0}
 --- !u!198 &7429857374192032164
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -187,7 +188,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 18.38
+      scalar: 4.67
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -625,7 +626,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 1
       minScalar: 0
       maxCurve:
         serializedVersion: 2

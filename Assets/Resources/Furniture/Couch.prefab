@@ -1,5 +1,19 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!64 &4891010979989232808
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 194528747058126900}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2534964839176971238, guid: 0d5e4b5f409bce042a0e40b5f74634a0, type: 3}
 --- !u!1001 &1779775411134272955
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11,6 +25,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Couch
+      objectReference: {fileID: 0}
+    - target: {fileID: 897118390879037914, guid: 0d34ee6b63edcc24b97de1d22a2fdeae,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 3104840546278683995, guid: 0d34ee6b63edcc24b97de1d22a2fdeae,
         type: 3}
@@ -82,6 +101,11 @@ PrefabInstance:
       propertyPath: type
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5586798379940537348, guid: 0d34ee6b63edcc24b97de1d22a2fdeae,
+        type: 3}
+      propertyPath: bounds.m_Extent.x
+      value: -8.9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0d34ee6b63edcc24b97de1d22a2fdeae, type: 3}
 --- !u!4 &3721543705619439840 stripped
@@ -152,10 +176,31 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5568371526223589888, guid: 0d5e4b5f409bce042a0e40b5f74634a0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: -3214480747899091959, guid: 0d5e4b5f409bce042a0e40b5f74634a0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 0d5e4b5f409bce042a0e40b5f74634a0,
         type: 3}
       propertyPath: m_Name
       value: couch1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0d5e4b5f409bce042a0e40b5f74634a0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0d5e4b5f409bce042a0e40b5f74634a0, type: 3}
+--- !u!1 &194528747058126900 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -5568371526223589888, guid: 0d5e4b5f409bce042a0e40b5f74634a0,
+    type: 3}
+  m_PrefabInstance: {fileID: 3461633432001146420}
+  m_PrefabAsset: {fileID: 0}

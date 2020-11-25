@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4864885773992228665}
   - component: {fileID: 5236727120481781394}
   - component: {fileID: 255116087375983553}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 4e677015cd1fc5241b0a5720f746ef5c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -104,7 +104,7 @@ PrefabInstance:
     - target: {fileID: 897118390879037914, guid: 0d34ee6b63edcc24b97de1d22a2fdeae,
         type: 3}
       propertyPath: m_Name
-      value: CubeWall
+      value: Armiore
       objectReference: {fileID: 0}
     - target: {fileID: 3104840546278683995, guid: 0d34ee6b63edcc24b97de1d22a2fdeae,
         type: 3}
@@ -169,6 +169,11 @@ PrefabInstance:
     - target: {fileID: 5586798379940537348, guid: 0d34ee6b63edcc24b97de1d22a2fdeae,
         type: 3}
       propertyPath: height
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5586798379940537348, guid: 0d34ee6b63edcc24b97de1d22a2fdeae,
+        type: 3}
+      propertyPath: type
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

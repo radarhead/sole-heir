@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 4929088956943428572}
   - component: {fileID: 2009577868535837217}
   - component: {fileID: 1934817250039817855}
-  m_Layer: 0
+  - component: {fileID: 1447796500480794846}
+  m_Layer: 10
   m_Name: Pistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,3 +95,20 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1447796500480794846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3133133802486880373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 713da85d5d4265f449cf0ed967b7a59b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 20
+  cooldownTime: 0.2
+  reloadTime: 0
+  automatic: 0
+  ammo: 10

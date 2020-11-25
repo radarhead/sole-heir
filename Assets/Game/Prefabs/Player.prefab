@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7833216534057079864}
   - component: {fileID: 5603363197639335858}
   - component: {fileID: 3124799748185232407}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,11 +104,13 @@ GameObject:
   m_Component:
   - component: {fileID: 6783063858549230163}
   - component: {fileID: 6783063858549230173}
+  - component: {fileID: 9189250713791446406}
   - component: {fileID: 8512274412745805060}
   - component: {fileID: 6337212097943369062}
   - component: {fileID: 7351331430389796646}
   - component: {fileID: -7790417404176658586}
   - component: {fileID: 4678813167726175527}
+  - component: {fileID: 3359284436149730122}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -157,11 +159,34 @@ MonoBehaviour:
   carryablePrefab: {fileID: 8047647315768830398, guid: 677b18cbd77a75f418bbd8d380b98dd4,
     type: 3}
   status: 0
+  playerIdentity: {fileID: 0}
   gunPrefab: {fileID: 7812962003808045124, guid: 4684a66dbbefeec43b5cd6d2073a81e1,
     type: 3}
   bulletPrefab: {fileID: 6497942227307708545, guid: 9d0e321d43f2b7b4ebca6eb3e2146d73,
     type: 3}
   carriedItem: 0
+--- !u!114 &9189250713791446406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6783063858549230160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 369c9919b3b92bc48aab532e735e9cfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  carryablePrefab: {fileID: 8047647315768830398, guid: 677b18cbd77a75f418bbd8d380b98dd4,
+    type: 3}
+  maxHealth: 100
+  bodyResource: Player
+  health: 0
+  alive: 1
+  playerIdentity: {fileID: 0}
+  deathVector: {x: 0, y: 0, z: 0}
 --- !u!114 &8512274412745805060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192,7 +217,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 116
   m_CollisionDetection: 2
 --- !u!114 &7351331430389796646
 MonoBehaviour:
@@ -328,3 +353,18 @@ MonoBehaviour:
   localPositionSensitivity: 0.01
   localRotationSensitivity: 0.01
   localScaleSensitivity: 0.01
+--- !u!114 &3359284436149730122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6783063858549230160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 833aaa75bed291649b1a94eb62ab7825, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  size: 4

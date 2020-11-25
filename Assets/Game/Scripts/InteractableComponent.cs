@@ -23,8 +23,8 @@ namespace SoleHeir
             transform.parent = furniture.transform;
             this.config = furniture.gameObject.GetComponentInChildren<InteractableConfig>();
 
-            interactableDisplay = transform.Find("Interactable Display").gameObject;
-            interactableDisplay.transform.parent = GameObject.Find("Canvas").transform;
+            interactableDisplay = GetComponentInChildren<CanvasGroup>().gameObject;
+            //interactableDisplay.transform.parent = GameObject.Find("Canvas").transform;
             interactableDisplay.transform.rotation = Quaternion.identity;
         }
 
@@ -44,7 +44,13 @@ namespace SoleHeir
                         && playerId.GetComponent<PlayerController>().status == PlayerStatus.INTERACTING
                         && (interactionTimer > 0 || config.holdInteraction))
                 {
-                    interactionTimer -= Time.deltaTime;
+                    interactionTimer = Mathf.Max(0, interactionTimer - Time.deltaTime);
+
+                    
+                    if(interactionTimer == 0)
+                    {
+                        CompleteInteraction();
+                    }
                 }
 
                 else
@@ -64,8 +70,21 @@ namespace SoleHeir
             interactableDisplay.transform.position = Camera.main.WorldToScreenPoint(GetCenter() + new Vector3(0, furniture.GetComponentInChildren<Collider>().bounds.max.y, 0));
             if(displayHideTimer == 0)
             {
-                
                 interactableDisplay.GetComponent<Animator>().SetBool("open", false);
+            }
+        }
+
+        void CompleteInteraction()
+        {
+            Carryable c = playerId.GetComponent<PlayerController>().HeldItem();
+            if(c != null)
+            {
+                c.AddToInventory(furniture.GetComponentInChildren<InventoryComponent>(), 0);
+            }
+            Carryable c2 = furniture.GetComponentInChildren<InventoryComponent>().Get(0);
+            if(c2 != null)
+            {
+                c2.AddToInventory(playerId.GetComponent<InventoryComponent>(), playerId.GetComponent<PlayerController>().carriedItem);
             }
         }
 

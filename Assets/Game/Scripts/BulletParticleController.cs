@@ -8,6 +8,7 @@ namespace SoleHeir
     public class BulletParticleController : NetworkBehaviour
     {
         public bool isAlive;
+        [SyncVar] public GameObject bullet;
 
         void Start(){
             isAlive = true;
@@ -25,6 +26,10 @@ namespace SoleHeir
         // Update is called once per frame
         void Update()
         {
+            if(isAlive && bullet != null)
+            {
+                transform.position = bullet.transform.position;
+            }
             if(!GetComponent<ParticleSystem>().IsAlive() && !isAlive)
             {
                 Destroy(gameObject);

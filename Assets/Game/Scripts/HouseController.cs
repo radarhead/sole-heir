@@ -8,11 +8,10 @@ namespace SoleHeir
 {
     public class HouseController : NetworkBehaviour
     {
-        [SyncVar]
-        public int seed = 0;
-        [SyncVar]
-        public int houseSize = 30;
+        [SyncVar] public int seed = 0;
+        [SyncVar] public int houseSize = 30;
         private PrototypeHouse prototypeHouse;
+        public GameObject npcPrefab;
         public GameObject roomPrefab;
 
         // Start is called before the first frame update
@@ -34,10 +33,12 @@ namespace SoleHeir
                 NetworkServer.Spawn(room);
 
                 room.GetComponent<RoomGenerator>().InitializeGrid();
-                room.GetComponent<RoomGenerator>().AddSpawner();
                 room.GetComponent<RoomGenerator>().Furnish();
-                //room.GetComponent<RoomGenerator>().BuildRoom(prototypeRoom);
+                room.GetComponent<RoomGenerator>().AddSpawner();
+                
             }
+            GameObject npc = Instantiate(npcPrefab, Vector3.zero, Quaternion.identity);     
+            NetworkServer.Spawn(npc);
         }
 
         public override void OnStartClient()
