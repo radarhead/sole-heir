@@ -4,6 +4,7 @@
 [Bb]uild/
 [Bb]uilds/
 [Ll]ogs/
+[Aa]dobe/
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # [Aa]ssets/AssetStoreTools*
@@ -73,7 +74,3 @@ crashlytics-build.properties
     Assets/Ludiq/Bolt.Flow/Generated/UnitOptions.db.meta
     Assets/Ludiq/Ludiq.Core/Generated/Property Providers
     Assets/Ludiq/Ludiq.Core/Generated/Property Providers.meta
-
-    ## Adobe
-    
-    Adobe/
