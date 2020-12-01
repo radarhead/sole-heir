@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0d5e4b5f409bce042a0e40b5f74634a0
+guid: 72d0359be1e7b7b479bac5a4af14a852
 ModelImporter:
   serializedVersion: 19301
   internalIDToNameTable: []
@@ -7,17 +7,7 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Black Unlit
-    second: {fileID: 2100000, guid: da65cb0023758c6438d0408226e4d530, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Black Unlit.001
-    second: {fileID: 2100000, guid: 325e6b734f36bdd45a10a72108019479, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Red Unlit
+      name: Purple Unlit
     second: {fileID: 2100000, guid: 4e677015cd1fc5241b0a5720f746ef5c, type: 2}
   materials:
     materialImportMode: 1
@@ -51,13 +41,13 @@ ModelImporter:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
-    addColliders: 1
+    addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
-    importCameras: 0
-    importLights: 0
+    importCameras: 1
+    importLights: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
