@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f60a1a7d993a1ae4ca53ebc0ab32ba67
+guid: 981e27b66c17f48478cb080c22102aee
 ModelImporter:
   serializedVersion: 19301
   internalIDToNameTable: []
@@ -7,12 +7,7 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Blue Unlit
-    second: {fileID: 2100000, guid: 4e677015cd1fc5241b0a5720f746ef5c, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material
+      name: Detail
     second: {fileID: 2100000, guid: 12b0aa6160763264c89560af5bd563c6, type: 2}
   materials:
     materialImportMode: 1
@@ -41,18 +36,18 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 1
+    isReadable: 0
   meshes:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
-    addColliders: 1
+    addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
-    importCameras: 0
-    importLights: 0
+    importCameras: 1
+    importLights: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
@@ -79,7 +74,7 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 0
+  importAnimation: 1
   humanDescription:
     serializedVersion: 3
     human: []
