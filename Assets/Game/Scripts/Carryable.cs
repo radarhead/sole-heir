@@ -8,20 +8,28 @@ namespace SoleHeir
     public class Carryable : NetworkBehaviour
     {
         public GameObject prefab;
+        public EntityUIController uiController;
         private GameObject entity;
         [SyncVar] public CarryableType type;
         [SyncVar] public string entityName;
         [SyncVar] private bool isChanged = false;
         [SyncVar] public int inventorySpace;
         [SyncVar] public NetworkIdentity owner;
+        [SyncVar] private int bools=0;
+        
+        //SyncDictionary<short, bool> boolTable = new SyncDictionary<short, bool>();
+
+        private Vector3 lastPosition = Vector3.zero;
+        private Vector3 velocity;
 
         // Start is called before the first frame update
         void Start()
         {
             if(entity == null) LoadEntity();
+            uiController = GetComponent<EntityUIController>();
         }
 
-        public CarryableType GetType() {return type;}
+        public CarryableType GetCarryableType() {return type;}
         public string GetEntityName() {return entityName;}
 
         public void SetType(CarryableType type)
@@ -54,12 +62,25 @@ namespace SoleHeir
 
         public void Spawn(Vector3 force)
         {
-            this.owner = null;
+            bool inRoom = false;
+            foreach(RoomGenerator room in Object.FindObjectsOfType<RoomGenerator>())
+            {
+                Collider c = GetComponentInChildren<Collider>();
+                if( c.bounds.min.x > room.bottomLeft.x && c.bounds.min.z > room.bottomLeft.z &&
+                    c.bounds.max.x < room.topRight.x && c.bounds.max.z < room.topRight.z)
+                    {
+                        inRoom = true;
+                    }
+            }
+
+            if(!inRoom) return;
+
             entity.SetActive(true);
             gameObject.GetComponent<Rigidbody>().detectCollisions = true;
             this.inventorySpace = 0;
             transform.parent = CarryableManager.instance.transform;
             GetComponent<Rigidbody>().AddForce(force, ForceMode.Impulse);
+            this.owner = null;
         }
 
         // Ensures that the item has the correct parent
@@ -78,6 +99,7 @@ namespace SoleHeir
                         entity.SetActive(true);
                         transform.parent = owner.transform;
                     }
+                    // If the item is hidden in an inventory
                     else
                     {
                         entity.SetActive(false);
@@ -96,6 +118,12 @@ namespace SoleHeir
             }
         }
 
+        public bool CanPickup(PlayerController player)
+        {
+            if(owner != null) return false;
+            return true;
+        }
+
         void LoadEntity()
         {
             if(entity != null)
@@ -109,8 +137,14 @@ namespace SoleHeir
                 gameObject.GetComponent<Rigidbody>().mass = 100;
             }
 
+            else if(type == CarryableType.KIT)
+            {
+                entity = Resources.Load("Carryables/Kits/"+entityName) as GameObject;
+                gameObject.GetComponent<Rigidbody>().mass = 20;
+            }
 
-            if(type == CarryableType.GUN)
+
+            else if(type == CarryableType.GUN)
             {
                 entity = Resources.Load("Carryables/Guns/"+entityName) as GameObject;
                 gameObject.GetComponent<Rigidbody>().mass = 5;
@@ -120,9 +154,27 @@ namespace SoleHeir
             {
                 entity = Instantiate(entity, transform);
             }
+            else
+            {
+                Debug.Log("Item not found");
+                GameObject.Destroy(gameObject);
+                NetworkServer.Destroy(gameObject);
+            }
             isChanged = false;
         }
+
+        public bool GetBool(int idx)
+        {
+            return (bools & 1 << (idx)) != 0;
+        }
+
+        public void SetBool(int idx, bool value)
+        {
+            if(value) bools |= (1 << idx);
+            else bools &= ~(1 << idx);
+        }
     }
+
 
     public enum CarryableType
     {

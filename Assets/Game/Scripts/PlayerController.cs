@@ -31,36 +31,37 @@ namespace SoleHeir
         Vector3 aimTarget;
         Quaternion rotation = Quaternion.identity;
         [SyncVar] public PlayerStatus status;
-        [SyncVar] public GameObject playerIdentity;
 
         Rigidbody body;
         private bool mouseAim = false;
         private Vector2 mousePos = Vector2.zero;
         public GameObject gunPrefab;
         public GameObject bulletPrefab;
+        public InventoryComponent inventory;
+        public AnonymousComponent anonymousComponent;
+
 
         [SyncVar]  public int carriedItem = 0;
 
         // Start is called before the first frame update
-        public override void OnStartClient()
+        void Start()
         { 
+            anonymousComponent = GetComponent<AnonymousComponent>();
+            if(isServer)
+            {
+                GetComponentInChildren<PlayerIdentity>().Create("Player");
+            }
             transform.parent = PlayerManager.instance.transform;
 
             body = GetComponent<Rigidbody>();
-            /*UnityEngine.Object[] spawners = GameObject.FindGameObjectsWithTag("SpawnLocation");
-            if(spawners.Length > 0)
-            {
-                GameObject spawner = spawners[UnityEngine.Random.Range(0, spawners.Length)] as GameObject;
-                this.transform.position = spawner.transform.position + new Vector3(1,0,1);
-            }*/
-
-            //heldItem = transform.Find("Gun").gameObject;
 
             if(isLocalPlayer)
             {
                 GetComponent<PlayerInput>().enabled = true;
                 CmdSetGun();
             }
+
+            inventory = GetComponent<InventoryComponent>();
         }
 
         [Command]
@@ -72,7 +73,12 @@ namespace SoleHeir
             gun.GetComponent<Carryable>().SetEntityName("Pistol");
             gun.GetComponent<Carryable>().AddToInventory(GetComponent<InventoryComponent>(), 0);
             carriedItem = 0;
-            //inventory.Add(gun);
+
+            GameObject kit = Instantiate(carryablePrefab, Vector3.zero, Quaternion.identity);
+            NetworkServer.Spawn(kit);
+            kit.GetComponent<Carryable>().SetType(CarryableType.KIT);
+            kit.GetComponent<Carryable>().SetEntityName("Kit A");
+            kit.GetComponent<Carryable>().AddToInventory(GetComponent<InventoryComponent>(), 1);
         }
 
         public void OnMove(InputValue value)
@@ -125,11 +131,11 @@ namespace SoleHeir
         {
             if(value.Get<Vector2>().y >= 120)
             {
-                CmdSetCarriedItem((carriedItem+1)%4);
+                CmdSetCarriedItem((carriedItem+3)%4);
             }
             else if(value.Get<Vector2>().y <= -120)
             {
-                CmdSetCarriedItem((carriedItem+3)%4);
+                CmdSetCarriedItem((carriedItem+1)%4);
             }
         }
 
@@ -154,7 +160,7 @@ namespace SoleHeir
                 if (heldItem != null && heldItem.type == CarryableType.GUN)
                 {
                     CameraController.instance.SetScreenShake(1f);
-                    CmdShootGun(aimTarget);
+                    CmdShootGun();
                     reloadTimer = 0.3f;
                 }
             }
@@ -196,21 +202,16 @@ namespace SoleHeir
         void CmdThrowItem(Vector3 aimTarget)
         {
             Carryable item = HeldItem();
-            item.Spawn(Quaternion.LookRotation(aimTarget)*new Vector3(0,0,50));
+            item.Spawn(Quaternion.LookRotation(aimTarget)*new Vector3(0,0,80));
         }
 
         [Command]
         void CmdPickupItem()
         {
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, overlapRadius);
-            foreach(Collider c in hitColliders)
+            Carryable nc = GetNearestCarryable();
+            if(nc != null)
             {
-                if(c.attachedRigidbody != null && c.attachedRigidbody.gameObject.GetComponentInParent<Carryable>())
-                {
-                    Carryable item = c.attachedRigidbody.gameObject.GetComponentInParent<Carryable>();
-                    item.AddToInventory(GetComponent<InventoryComponent>(), carriedItem);
-                    return;
-                }
+                nc.AddToInventory(GetComponent<InventoryComponent>(), carriedItem);
             }
         }
 
@@ -219,7 +220,7 @@ namespace SoleHeir
         {
             status = PlayerStatus.INTERACTING;
             body.velocity = new Vector3(0,0,0);
-            ic.GetComponent<InteractableComponent>().Interact(netIdentity);
+            ic.GetComponent<InteractableComponent>().Interact(this);
         }
 
         [Command]
@@ -229,20 +230,17 @@ namespace SoleHeir
         }
 
         [Command]
-        void CmdShootGun(Vector3 aimTarget)
+        void CmdShootGun()
         {
             if(reloadTimer==0)
             {
-                rotationTimer = rotationTime;
-                body.rotation = Quaternion.LookRotation(aimTarget);
                 transform.GetComponent<Rigidbody>().AddForce(Quaternion.LookRotation(aimTarget) * new Vector3(0,0,-200));
-                GameObject bullet = Instantiate(bulletPrefab, transform.position +new Vector3(0,1,0), Quaternion.LookRotation(aimTarget));
+                GameObject bullet = Instantiate(bulletPrefab, transform.position +new Vector3(0,1,0), body.rotation);
                 BulletController controller = bullet.GetComponentInChildren<BulletController>();
                 GunConfig config = HeldItem().GetComponentInChildren<GunConfig>();
                 controller.damage = config.damage;
-                controller.playerIdentity = playerIdentity;
                 Physics.IgnoreCollision(bullet.GetComponent<Collider>(), gameObject.GetComponentInChildren<Collider>());
-                bullet.GetComponent<Rigidbody>().velocity = Quaternion.LookRotation(aimTarget) * new Vector3(0,0,80);
+                bullet.GetComponent<Rigidbody>().velocity = body.rotation * new Vector3(0,0,80);
                 reloadTimer = 0.3f;
                 NetworkServer.Spawn(bullet);
             }
@@ -255,12 +253,14 @@ namespace SoleHeir
             rotationTimer = Math.Max(0f, rotationTimer - Time.deltaTime);
             bool alive = IsAlive();
 
+
+
             if(!alive)
             {
                 transform.Find("Capsule").gameObject.layer = 12;
                 if(!isLocalPlayer)
                 {
-                    foreach(Renderer r in GetComponentsInChildren<Renderer>())
+                    foreach(Renderer r in transform.Find("Capsule").gameObject.GetComponentsInChildren<Renderer>())
                     {
                         r.enabled = false;
                     }
@@ -271,11 +271,22 @@ namespace SoleHeir
             if(isLocalPlayer)
             {
                 InteractableComponent ic = GetNearestInteractable();
+                InteractableComponent nearSabotage = GetNearestSabotageable();
+                Carryable nc = GetNearestCarryable();
                 Carryable heldItem = HeldItem();
-                if(ic!=null && alive && !(heldItem != null && heldItem.type == CarryableType.BODY))
+                if(ic!=null)
                 {
-                    ic.interactableDisplay.GetComponent<Animator>().SetBool("open", true);
-                    ic.displayHideTimer = 0.05f;
+                    ic.uiController.CanInteract();
+                }
+                // If the player can sabotage
+                if(nearSabotage!= null)
+                {
+                    nearSabotage.uiController.CanSabotage();
+                }
+
+                if(nc != null && heldItem == null)
+                {
+                    nc.uiController.CanPickUp();
                 }
                 // If the player can walk around.
                 if(status == PlayerStatus.FREE)
@@ -352,30 +363,75 @@ namespace SoleHeir
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5);
             foreach (Collider hitCollider in hitColliders)
             {
-                FurnitureController f = hitCollider.GetComponentInParent<FurnitureController>();
-                if(f != null)
+                InteractableComponent ic = hitCollider.GetComponentInParent<InteractableComponent>();
+                if(ic != null && ic.CanInteract(this))
                 {
-                    InteractableComponent ic = f.GetComponentInChildren<InteractableComponent>();
-                    if(ic != null && hitCollider.GetComponentInParent<PlayerController>() == null)
+                    float playerDistance = GetColliderDistance(ic,this);
+                    if(nearest == null)
                     {
-                        float playerDistance = ic.GetDistanceToPlayer(netIdentity);
-                        if(playerDistance < ic.config.interactionDistance)
+                        nearest = ic;
+                    }
+                    else
+                    {
+                        if(playerDistance < GetColliderDistance(nearest,this))
                         {
-                            if(nearest == null)
-                            {
-                                nearest = ic;
-                            }
-                            else
-                            {
-                                if(playerDistance < nearest.GetDistanceToPlayer(netIdentity))
-                                {
-                                    nearest = ic;
-                                }
-                            }
+                            nearest = ic;
                         }
                     }
                 }
-                
+            }
+            return nearest;
+        }
+
+        
+        InteractableComponent GetNearestSabotageable()
+        {
+            InteractableComponent nearest = null;
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5);
+            foreach (Collider hitCollider in hitColliders)
+            {
+                InteractableComponent ic = hitCollider.GetComponentInParent<InteractableComponent>();
+                if(ic != null && ic.CanSabotage(this))
+                {
+                    float playerDistance = GetColliderDistance(ic,this);
+                    if(nearest == null)
+                    {
+                        nearest = ic;
+                    }
+                    else
+                    {
+                        if(playerDistance < GetColliderDistance(nearest,this))
+                        {
+                            nearest = ic;
+                        }
+                    }
+                }
+            }
+            return nearest;
+        }
+
+        Carryable GetNearestCarryable()
+        {
+            Carryable nearest = null;
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5);
+            foreach (Collider hitCollider in hitColliders)
+            {
+                Carryable ic = hitCollider.GetComponentInParent<Carryable>();
+                if(ic != null && ic.CanPickup(this))
+                {
+                    float playerDistance = GetColliderDistance(ic,this);
+                    if(nearest == null)
+                    {
+                        nearest = ic;
+                    }
+                    else
+                    {
+                        if(playerDistance < GetColliderDistance(nearest,this))
+                        {
+                            nearest = ic;
+                        }
+                    }
+                }
             }
             return nearest;
         }
@@ -383,6 +439,13 @@ namespace SoleHeir
         public Carryable HeldItem()
         {
             return GetComponent<InventoryComponent>().Get(carriedItem);
+        }
+
+        public static float GetColliderDistance(MonoBehaviour a, MonoBehaviour b)
+        {
+            Vector3 pointA = a.GetComponentInChildren<Collider>().bounds.center;
+            Vector3 pointB = b.GetComponentInChildren<Collider>().bounds.center;
+            return (pointA-pointB).magnitude;
         }
     }
 }

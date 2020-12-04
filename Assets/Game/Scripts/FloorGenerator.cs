@@ -7,7 +7,8 @@ namespace SoleHeir
 {
     public class FloorGenerator : MonoBehaviour
     {
-        
+        public GameObject doorGetter;
+
         // Start is called before the first frame update
         void Start()
         {
@@ -27,44 +28,49 @@ namespace SoleHeir
 
             float offset;
 
-            offset = roomHeight/2 - 1;
+            offset = roomHeight/2;
             foreach (PrototypeDoorway doorway in prototypeRoom.GetLeftDoorways())
             {
+                
                 if(doorway.other != null)
                 {
-                    createMesh.AddMesh(-roomSpacing/2, offset, 0, offset+2);
+                    float width = doorGetter.GetComponent<DoorGetter>().GetDoorType(doorway).GetComponent<DoorPrototype>().GetWidth();
+                    createMesh.AddMesh(-roomSpacing/2, offset-width/2, 0, offset+width/2);
                 }
                 offset += roomHeight + roomSpacing;
 
             }
 
-            offset = roomWidth/2-1;
+            offset = roomWidth/2;
             foreach (PrototypeDoorway doorway in prototypeRoom.GetBottomDoorways())
             {
                 if(doorway.other != null)
                 {
-                    createMesh.AddMesh(offset, -roomSpacing/2, offset+2, 0);
+                    float width = doorGetter.GetComponent<DoorGetter>().GetDoorType(doorway).GetComponent<DoorPrototype>().GetWidth();
+                    createMesh.AddMesh(offset-width/2, -roomSpacing/2, offset+width/2, 0);
                 }
                 offset += roomWidth + roomSpacing;
 
             }
-            offset = roomHeight/2 - 1;
+            offset = roomHeight/2;
             foreach (PrototypeDoorway doorway in prototypeRoom.GetRightDoorways())
             {
                 if(doorway.other != null)
                 {
-                    createMesh.AddMesh(xSize, offset, xSize+roomSpacing/2, offset+2);
+                    float width = doorGetter.GetComponent<DoorGetter>().GetDoorType(doorway).GetComponent<DoorPrototype>().GetWidth();
+                    createMesh.AddMesh(xSize, offset-width/2, xSize+roomSpacing/2, offset+width/2);
                 }
                 offset += roomHeight + roomSpacing;
 
             }
 
-            offset = roomWidth/2-1;
+            offset = roomWidth/2;
             foreach (PrototypeDoorway doorway in prototypeRoom.GetTopDoorways())
             {
                 if(doorway.other != null)
                 {
-                    createMesh.AddMesh(offset, ySize, offset+2, ySize+roomSpacing/2);
+                    float width = doorGetter.GetComponent<DoorGetter>().GetDoorType(doorway).GetComponent<DoorPrototype>().GetWidth();
+                    createMesh.AddMesh(offset-width/2, ySize, offset+width/2, ySize+roomSpacing/2);
                 }
                 offset += roomWidth + roomSpacing;
 

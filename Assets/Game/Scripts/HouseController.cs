@@ -10,9 +10,11 @@ namespace SoleHeir
     {
         [SyncVar] public int seed = 0;
         [SyncVar] public int houseSize = 30;
-        private PrototypeHouse prototypeHouse;
+        public Material darkness;
+        public PrototypeHouse prototypeHouse;
         public GameObject npcPrefab;
         public GameObject roomPrefab;
+        public RoomGenerator playerRoom;
 
         // Start is called before the first frame update
         void Start()
@@ -23,7 +25,6 @@ namespace SoleHeir
         public override void OnStartServer()
         {
             UnityEngine.Random.InitState (seed);
-            //seed = Random.Range(0,999999999);
             prototypeHouse = new PrototypeHouse(seed, houseSize);
             foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
             {
@@ -35,6 +36,7 @@ namespace SoleHeir
                 room.GetComponent<RoomGenerator>().InitializeGrid();
                 room.GetComponent<RoomGenerator>().Furnish();
                 room.GetComponent<RoomGenerator>().AddSpawner();
+                room.GetComponent<RoomGenerator>().BuildRoom(prototypeRoom);
                 
             }
             GameObject npc = Instantiate(npcPrefab, Vector3.zero, Quaternion.identity);     
@@ -43,29 +45,76 @@ namespace SoleHeir
 
         public override void OnStartClient()
         {
-            UnityEngine.Random.InitState (seed);
-            prototypeHouse = new PrototypeHouse(seed, houseSize);
-            foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
+            if(!isServer)
             {
-                foreach(RoomGenerator roomGenerator in Object.FindObjectsOfType<RoomGenerator>())
+                UnityEngine.Random.InitState (seed);
+                prototypeHouse = new PrototypeHouse(seed, houseSize);
+                foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
                 {
-                    
-                    if(roomGenerator.roomPosition == prototypeRoom.GetPosition())
+                    foreach(RoomGenerator roomGenerator in Object.FindObjectsOfType<RoomGenerator>())
                     {
-                        roomGenerator.BuildRoom(prototypeRoom);
+                        
+                        if(roomGenerator.roomPosition == prototypeRoom.GetPosition())
+                        {
+                            roomGenerator.BuildRoom(prototypeRoom);
+                        }
                     }
                 }
-            }
 
-            foreach(RoomGenerator roomGenerator in Object.FindObjectsOfType<RoomGenerator>())
-            {
-                roomGenerator.transform.parent = transform;
+                foreach(RoomGenerator roomGenerator in Object.FindObjectsOfType<RoomGenerator>())
+                {
+                    roomGenerator.transform.parent = transform;
+                }
             }
+            
         }
 
         // Update is called once per frame
         void Update()
         {
+            if(ClientScene.localPlayer != null)
+            {
+                PlayerController pc = ClientScene.localPlayer.GetComponent<PlayerController>();
+                if(pc!=null &&pc.anonymousComponent.currentRoom != null)
+                {
+                    Shader.SetGlobalColor("_DarkColor",
+                        Color.Lerp(
+                            Shader.GetGlobalColor("_DarkColor"),
+                            pc.anonymousComponent.currentRoom.colorPalette.Dark(),
+                            Time.deltaTime*10
+                        )
+                    );
+                    Shader.SetGlobalColor("_DarkAccentColor",
+                        Color.Lerp(
+                            Shader.GetGlobalColor("_DarkAccentColor"),
+                            pc.anonymousComponent.currentRoom.colorPalette.DarkAccent(),
+                            Time.deltaTime*10
+                        )
+                    );
+                    Shader.SetGlobalColor("_PrimaryColor",
+                        Color.Lerp(
+                            Shader.GetGlobalColor("_PrimaryColor"),
+                            pc.anonymousComponent.currentRoom.colorPalette.Primary(),
+                            Time.deltaTime*10
+                        )
+                    );
+                    Shader.SetGlobalColor("_LightAccentColor",
+                        Color.Lerp(
+                            Shader.GetGlobalColor("_LightAccentColor"),
+                            pc.anonymousComponent.currentRoom.colorPalette.LightAccent(),
+                            Time.deltaTime*10
+                        )
+                    );
+                    Shader.SetGlobalColor("_LightColor",
+                        Color.Lerp(
+                            Shader.GetGlobalColor("_LightColor"),
+                            pc.anonymousComponent.currentRoom.colorPalette.Light(),
+                            Time.deltaTime*10
+                        )
+                    );
+                    
+                }
+            }
         }
     }
 }

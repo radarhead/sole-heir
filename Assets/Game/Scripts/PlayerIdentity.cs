@@ -7,16 +7,26 @@ namespace SoleHeir
 {
     public class PlayerIdentity : NetworkBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
+        [SyncVar] private int id = -1;
+        PlayerIdentitySystem playerIdentitySystem;
+
+        void Awake()
         {
-            
+            playerIdentitySystem = Object.FindObjectOfType<PlayerIdentitySystem>();
+        }
+        public PlayerIdentityStruct Get()
+        {
+            return playerIdentitySystem.GetPIS(id);
         }
 
-        // Update is called once per frame
-        void Update()
+        public void Create(string name)
         {
-            
+            id = playerIdentitySystem.NewPIS(name).id;
         }
+
+        public void Clone(PlayerIdentity clone)
+        {
+            clone.id = this.id;
+        }   
     }
 }

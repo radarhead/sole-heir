@@ -11,6 +11,8 @@ namespace SoleHeir
     {
         [SyncVar]
         public Vector2 roomPosition;
+        public Shader shader;
+        public Material furnitureMaterial;
         public int seed;
         public float roomWidth = 8.0f;
         public float roomHeight = 6.0f;
@@ -19,6 +21,8 @@ namespace SoleHeir
         public GameObject floorPrefab;
         public GenerationGrid<SpaceType> roomGrid;
         public GameObject furniturePrefab;
+        public GameObject doorGetter;
+        public ColorPalette colorPalette;
         public GameObject spawnerPrefab;
         public Vector3 bottomLeft;
         public Vector3 topRight;
@@ -30,8 +34,7 @@ namespace SoleHeir
         private int gridSpacing = 1;
 
         public Texture2D wallTexture;
-        private bool isLocalRoom = true;
-        private float alpha = 0.0f;
+        public bool isLocalRoom = true;
         public float velocity = 3.0f;
 
 
@@ -69,10 +72,10 @@ namespace SoleHeir
             bottomWall.transform.localScale = new Vector3(1,-1,1);
 
             //Make bottom wall invisible
-            foreach(var item in bottomWall.GetComponentsInChildren<MeshRenderer>())
+            /*foreach(var item in bottomWall.GetComponentsInChildren<MeshRenderer>())
             {
                 item.enabled = false;
-            }
+            }*/
 
 
             GameObject top = transform.Find("Top").gameObject;
@@ -102,8 +105,8 @@ namespace SoleHeir
 
             GameObject topFront = transform.Find("TopFront").gameObject;
             CreateMesh topFrontMesh = topFront.GetComponent(typeof(CreateMesh)) as CreateMesh;
-            topFrontMesh.AddMesh(new Vector2(0,-roomSpacing/2), new Vector2(xSize, 0));
-            topFrontMesh.transform.localPosition = new Vector3(0,wallHeight,-0.2f);
+            topFrontMesh.AddMesh(new Vector2(0,0), new Vector2(xSize, roomSpacing/2));
+            topFrontMesh.transform.localPosition = new Vector3(0,wallHeight,-roomSpacing/2-0.2f);
 
             GameObject topFront2 = transform.Find("TopFront2").gameObject;
             CreateMesh topFront2Mesh = topFront2.GetComponent(typeof(CreateMesh)) as CreateMesh;
@@ -129,26 +132,15 @@ namespace SoleHeir
             bottomLeft = transform.position;
             topRight = bottomLeft + new Vector3(xSize,0,ySize);
 
-            UnityEngine.Object[] wallTextures = Resources.LoadAll("Textures/Wallpapers");
-            Texture2D thisWallTexture = wallTextures[UnityEngine.Random.Range(0, wallTextures.Length)] as Texture2D;
-            SetTextureByName(thisWallTexture, "Wall");
-
-            UnityEngine.Object[] wallPanelingTextures = Resources.LoadAll("Textures/WallPaneling");
-            Texture2D thisWallPanelingTexture = wallPanelingTextures[UnityEngine.Random.Range(0, wallPanelingTextures.Length)] as Texture2D;
-            SetTextureByName(thisWallPanelingTexture, "WallPaneling");
-
-            UnityEngine.Object[] floorTextures = Resources.LoadAll("Textures/Flooring");
-            Texture2D thisFloorTexture = floorTextures[UnityEngine.Random.Range(0, floorTextures.Length)] as Texture2D;
-            SetTextureByName(thisFloorTexture, "Floor");
-
-            CreateLighting();
+            colorPalette = ColorManager.instance.RandomPalette();
+            
         }
 
         // Update is called once per frame
         void Update()
         {
             
-            if(!isLocalRoom)
+            /*if(!isLocalRoom)
             {
                 alpha += velocity * Time.deltaTime;
                 if(alpha>1.0f) alpha = 1.0f;
@@ -160,22 +152,8 @@ namespace SoleHeir
             }
 
 
-            SetTargetTransparent(transform.Find("TopFull").gameObject, (alpha*4)/5f);
-            SetTargetTransparent(transform.Find("TopFront2").gameObject, alpha);
-            foreach (var i in gameObject.GetComponentsInChildren<Light>())
-            {
-                Light l = i as Light;
-                if(alpha == 1.0f)
-                {
-                    i.enabled = false;
-                }
-                else
-                {
-                    i.enabled = true;
-                }
-                l.intensity = (1-alpha);
-            }
-            //SetTargetTransparent(transform.Find("FrontFront").gameObject, alpha);
+            transform.Find("TopFull").GetComponent<Renderer>().material.SetFloat("_Alpha", (alpha*4)/5f);
+            transform.Find("TopFront2").GetComponent<Renderer>().material.SetFloat("_Alpha", alpha);*/
         }
 
         public void SetEnabled(bool enabled)
@@ -250,11 +228,11 @@ namespace SoleHeir
                 PrototypeDoorway doorway = prototypeRoom.GetLeftDoorways()[i];
                 if(doorway.other != null)
                 {
-                    float doorWidth = 2;
+                    float doorWidth = doorGetter.GetComponent<DoorGetter>().GetDoorType(doorway).GetComponent<DoorPrototype>().GetWidth();
                     float doorY = (i+1)*(roomSpacing+roomHeight)-roomSpacing-roomHeight/2;
                     roomGrid.SetRange(
-                        EzVec(0, doorY-doorWidth/2),
-                        EzVec(doorSpacing, doorY+doorWidth/2),
+                        new Vector2Int(0, (int)(doorY-doorWidth/2))*gridSize,
+                        new Vector2Int((int)doorSpacing, (int)(doorY+doorWidth/2))*gridSize,
                         SpaceType.ROOM_FILLED);
                 }
 
@@ -266,12 +244,12 @@ namespace SoleHeir
                 PrototypeDoorway doorway = prototypeRoom.GetTopDoorways()[i];
                 if(doorway.other != null)
                 {
-                    float doorWidth = 2;
+                    float doorWidth = doorGetter.GetComponent<DoorGetter>().GetDoorType(doorway).GetComponent<DoorPrototype>().GetWidth();
                     float doorX = (i+1)*(roomSpacing+roomWidth)-roomSpacing-roomWidth/2;
                     
                     roomGrid.SetRange(
-                        EzVec(doorX-doorWidth/2, ySize-doorSpacing),
-                        EzVec(doorX+doorWidth/2, ySize),
+                        new Vector2Int((int)(doorX-doorWidth/2), (int)(ySize-doorSpacing))*gridSize,
+                        new Vector2Int((int)(doorX+doorWidth/2), (int)ySize)*gridSize,
                         SpaceType.ROOM_FILLED);
                 }
             }
@@ -282,11 +260,11 @@ namespace SoleHeir
                 PrototypeDoorway doorway = prototypeRoom.GetRightDoorways()[i];
                 if(doorway.other != null)
                 {
-                    float doorWidth = 2;
+                    float doorWidth = doorGetter.GetComponent<DoorGetter>().GetDoorType(doorway).GetComponent<DoorPrototype>().GetWidth();;
                     float doorY = (i+1)*(roomSpacing+roomHeight)-roomSpacing-roomHeight/2;
                     roomGrid.SetRange(
-                        EzVec(xSize-doorSpacing, doorY-doorWidth/2),
-                        EzVec(xSize, doorY+doorWidth/2),
+                        new Vector2Int((int)(xSize-doorSpacing), (int)(doorY-doorWidth/2))*gridSize  + new Vector2Int(0,-1),
+                        new Vector2Int((int)xSize, (int)(doorY+doorWidth/2))*gridSize  + new Vector2Int(0,1),
                         SpaceType.ROOM_FILLED);
                 }
             }
@@ -505,44 +483,5 @@ namespace SoleHeir
             return (furniture.height * gridSize) - 1;
         }
 
-        private Vector2Int EzVec(float width, float height)
-        {
-            return new Vector2Int((int)Math.Floor(width*gridSize), (int)Math.Floor(height*gridSize));
-        }
-
-        void SetTargetTransparent(GameObject target, float transparency)
-        {
-            Component[] a = target.GetComponentsInChildren(typeof(Renderer));
-            foreach (Component b in a)
-            {
-                Renderer c = (Renderer)b;
-                c.material.SetColor("_BaseColor", new Color(0,0,0, transparency));
-            }
-        }
-
-        private void SetTextureByName(Texture2D texture, String name)
-        {
-            foreach(var i in gameObject.GetComponentsInChildren<MeshRenderer>())
-            {
-                MeshRenderer r = i as MeshRenderer;
-                if(r.material.name == name || r.material.name == name+" (Instance)")
-                {
-                    r.material.SetTexture("_MainTex", texture);
-                }
-            }
-        }
-
-        private void CreateLighting()
-        {
-            for(int x = 0; x<prototypeRoom.GetSize().x; x++)
-            {
-                for(int y=0; y<prototypeRoom.GetSize().y; y++)
-                {
-                    GameObject light = GameObject.Instantiate(lightSource, transform.Find("Light"));
-                    light.transform.localPosition = new Vector3((x+0.5f)*(roomWidth+roomSpacing)-roomSpacing/2,0,(y+0.5f)*(roomHeight+roomSpacing)-roomSpacing/2);
-                }
-            }
-            transform.Find("Light").localPosition = new Vector3(0,wallHeight+1,0);
-        }
     }
 }

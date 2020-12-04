@@ -8,7 +8,6 @@ namespace SoleHeir
     public class FurnitureController : NetworkBehaviour
     {
         [SyncVar] public int resourcesIndex;
-        public GameObject interactorPrefab;
         [SyncVar] public NetworkIdentity room;
 
         /*public override void OnStartServer()
@@ -25,16 +24,10 @@ namespace SoleHeir
             child.transform.position = transform.position;
             child.transform.rotation = transform.rotation;
 
-            if(isServer)
-            {
-                if(GetComponentInChildren<InteractableConfig>())
-                {
-                    GameObject interactor = Instantiate(interactorPrefab, transform.position, transform.rotation);
-                    interactor.GetComponent<InteractableComponent>().furniture = netIdentity;
-                    NetworkServer.Spawn(interactor);
-                }
 
-                if(GetComponentInChildren<Furniture>().inventorySize > 0)
+            if (GetComponentInChildren<Furniture>().inventorySize > 0)
+            {
+                if (isServer)
                 {
                     GetComponent<InventoryComponent>().size = GetComponentInChildren<Furniture>().inventorySize;
                 }

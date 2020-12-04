@@ -41,6 +41,8 @@ namespace SoleHeir
         void FixedUpdate()
         {
             screenShake = Mathf.Max(0f, screenShake - Time.deltaTime*screenShakeVelocity);
+
+            // Find the local player
             GameObject player = null;
             foreach (GameObject thisPlayer in GameObject.FindGameObjectsWithTag("Player"))
             {
@@ -49,37 +51,24 @@ namespace SoleHeir
                     player = thisPlayer;
                 }
             }
-
             if(player!=null)
             {
-                foreach (GameObject room in GameObject.FindGameObjectsWithTag("Room"))
+                RoomGenerator roomGenerator = player.GetComponent<AnonymousComponent>().currentRoom;
+                if(roomGenerator != null)
                 {
-                    RoomGenerator roomGenerator = room.GetComponent<RoomGenerator>();
-                    if(player.transform.position.x > roomGenerator.bottomLeft.x - roomGenerator.roomSpacing/2 
-                        && player.transform.position.x < roomGenerator.topRight.x + roomGenerator.roomSpacing/2
-                        && player.transform.position.z > roomGenerator.bottomLeft.z - roomGenerator.roomSpacing/2
-                        && player.transform.position.z < roomGenerator.topRight.z + roomGenerator.roomSpacing/2)
-                    {
-                        currentRoom = (roomGenerator.topRight + roomGenerator.bottomLeft) / 2;
-                        roomGenerator.SetEnabled(true);
-                        bottomY = roomGenerator.bottomLeft.z;
-                        targetOffset = offset + new Vector3(0,0, -Vector3.Distance(roomGenerator.bottomLeft, roomGenerator.topRight)/4);
-                    }
-                    else
-                    {
-                        roomGenerator.SetEnabled(false);
-                    }
-
+                    currentRoom = (roomGenerator.topRight + roomGenerator.bottomLeft) / 2;
+                    bottomY = roomGenerator.bottomLeft.z;
+                    targetOffset = offset + new Vector3(0,0, -Vector3.Distance(roomGenerator.bottomLeft, roomGenerator.topRight)/4);
+                                
+                    transform.rotation = Quaternion.Euler(rotation);
+                    targetPosition = ((player.transform.position*2 + currentRoom) / 3) + transform.rotation*targetOffset;
+                    targetPosition = new Vector3(targetPosition.x, targetPosition.y, Math.Max(targetPosition.z, bottomY + bottomYOffset));
+                    realPosition = Vector3.SmoothDamp(realPosition, targetPosition, ref velocity, smoothTime);
+                    transform.position = realPosition + new Vector3(
+                        UnityEngine.Random.Range(-screenShake, screenShake),
+                        0,
+                        UnityEngine.Random.Range(-screenShake, screenShake));
                 }
-                
-                transform.rotation = Quaternion.Euler(rotation);
-                targetPosition = ((player.transform.position*2 + currentRoom) / 3) + transform.rotation*targetOffset;
-                targetPosition = new Vector3(targetPosition.x, targetPosition.y, Math.Max(targetPosition.z, bottomY + bottomYOffset));
-                realPosition = Vector3.SmoothDamp(realPosition, targetPosition, ref velocity, smoothTime);
-                transform.position = realPosition + new Vector3(
-                    UnityEngine.Random.Range(-screenShake, screenShake),
-                    0,
-                    UnityEngine.Random.Range(-screenShake, screenShake));
             }
         }
 

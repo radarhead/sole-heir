@@ -8,93 +8,82 @@ namespace SoleHeir
     public class InteractableComponent : NetworkBehaviour
     {
         public InteractableConfig config;
+        public IInteractCondition interactCondition; 
+        public IInteractAction interactAction; 
+        public ISabotageAction sabotageAction; 
+        public EntityUIController uiController; 
 
         // Runtime
         [SyncVar] public NetworkIdentity playerId;
         [SyncVar] public InteractionStatus status;
         [SyncVar] public float interactionTimer;
-        [SyncVar] public NetworkIdentity furniture;
-
-        public GameObject interactableDisplay;
-        public float displayHideTimer;
 
         void Start()
         {
-            transform.parent = furniture.transform;
-            this.config = furniture.gameObject.GetComponentInChildren<InteractableConfig>();
-
-            interactableDisplay = GetComponentInChildren<CanvasGroup>().gameObject;
-            //interactableDisplay.transform.parent = GameObject.Find("Canvas").transform;
-            interactableDisplay.transform.rotation = Quaternion.identity;
+            this.config = gameObject.GetComponentInChildren<InteractableConfig>();
+            this.uiController = GetComponentInChildren<EntityUIController>();
+            this.sabotageAction = GetComponentInChildren<ISabotageAction>();
+            this.interactAction = GetComponentInChildren<IInteractAction>();
+            this.interactCondition = GetComponentInChildren<IInteractCondition>();
+            if(config == null) this.enabled=false;
         }
-
         void Update()
         {
-            displayHideTimer = Mathf.Max(0, displayHideTimer - Time.deltaTime);
-
-            
-
-            if(!isServer) return;
-            if(status == InteractionStatus.INTERACTING)
+            float oldInteractionTimer = interactionTimer;
+            // Only reduce timer if you have to
+            if(sabotageAction == null || (sabotageAction != null && CountPlayersInRange() > 1))
             {
-                interactableDisplay.GetComponent<Animator>().SetFloat("progress", ((config.interactionTime-interactionTimer)/config.interactionTime));
-                
-                if(playerId != null 
-                        && GetDistanceToPlayer(playerId) < config.interactionDistance 
-                        && playerId.GetComponent<PlayerController>().status == PlayerStatus.INTERACTING
-                        && (interactionTimer > 0 || config.holdInteraction))
-                {
-                    interactionTimer = Mathf.Max(0, interactionTimer - Time.deltaTime);
-
-                    
-                    if(interactionTimer == 0)
-                    {
-                        CompleteInteraction();
-                    }
-                }
-
-                else
-                {
-                    if(playerId != null)
-                    {
-                        playerId.GetComponent<PlayerController>().status = PlayerStatus.FREE;
-                    }
-                    this.status = InteractionStatus.FREE;
-                    this.playerId = null;
-                    this.interactionTimer = 0;
-                }
+                interactionTimer = Mathf.Max(0, interactionTimer - Time.deltaTime);
             }
             
-            interactableDisplay.GetComponent<Animator>().SetBool("interacting", (status == InteractionStatus.INTERACTING));
-            
-            interactableDisplay.transform.position = Camera.main.WorldToScreenPoint(GetCenter() + new Vector3(0, furniture.GetComponentInChildren<Collider>().bounds.max.y, 0));
-            if(displayHideTimer == 0)
+            if(isServer)
             {
-                interactableDisplay.GetComponent<Animator>().SetBool("open", false);
+                if(status == InteractionStatus.INTERACTING)
+                {
+                    
+                    if(     playerId != null 
+                            && GetDistanceToPlayer(playerId.GetComponent<PlayerController>()) < config.interactionDistance 
+                            && playerId.GetComponent<PlayerController>().status == PlayerStatus.INTERACTING
+                            && (oldInteractionTimer > 0 || config.holdInteraction))
+                    {
+                        if(interactionTimer == 0)
+                        {
+                            CompleteInteraction();
+                        }
+                    }
+
+                    else
+                    {
+                        if(playerId != null)
+                        {
+                            playerId.GetComponent<PlayerController>().status = PlayerStatus.FREE;
+                        }
+                        this.status = InteractionStatus.FREE;
+                        this.playerId = null;
+                        this.interactionTimer = 0;
+                    }
+                }
             }
         }
 
+        [Command]
+        public void CmdSetTimer()
+        {
+            this.interactionTimer = config.interactionTime;
+        }
         void CompleteInteraction()
         {
-            Carryable c = playerId.GetComponent<PlayerController>().HeldItem();
-            if(c != null)
-            {
-                c.AddToInventory(furniture.GetComponentInChildren<InventoryComponent>(), 0);
-            }
-            Carryable c2 = furniture.GetComponentInChildren<InventoryComponent>().Get(0);
-            if(c2 != null)
-            {
-                c2.AddToInventory(playerId.GetComponent<InventoryComponent>(), playerId.GetComponent<PlayerController>().carriedItem);
-            }
+            IInteractAction action = GetComponentInChildren<IInteractAction>();
+            if(action == null) return;
+            action.Interact(playerId.GetComponent<PlayerController>());
         }
 
-        public float GetDistanceToPlayer(NetworkIdentity playerId)
+        public float GetDistanceToPlayer(PlayerController player)
         {
             
-            if (playerId != null)
+            if (player != null)
             {
-                GameObject player = playerId.gameObject;
-                Collider thisCollider = furniture.GetComponentInChildren<Collider>();
+                Collider thisCollider = GetComponentInChildren<Collider>();
                 return (player.transform.position - thisCollider.ClosestPoint(player.transform.position)).magnitude;
             }
             else
@@ -105,26 +94,78 @@ namespace SoleHeir
 
         public Vector3 GetCenter()
         {
-            Vector3 center = furniture.GetComponentInChildren<Collider>().bounds.center;
+            Vector3 center = GetComponentInChildren<Collider>().bounds.center;
             return new Vector3(center.x, 0, center.z);
         }
 
-        public void Interact(NetworkIdentity playerId)
+        public PlayerController GetPlayer()
         {
-            if(status == InteractionStatus.FREE)
-            {
-                if(GetDistanceToPlayer(playerId) < config.interactionDistance)
-                {
-                    this.playerId = playerId;
-                    this.interactionTimer = config.interactionTime;
-                    this.status = InteractionStatus.INTERACTING;
-                }
-            }
+            if (playerId==null) return null;
+            return playerId.GetComponent<PlayerController>();
         }
 
-        void OnDestroy()
+        public bool CanSabotage(PlayerController player)
         {
-            GameObject.Destroy(interactableDisplay);
+            if(!InInteractRange(player)) return false;
+            if (GetComponentInChildren<ISabotageAction>() == null) return false;
+            if(playerId == null) return false;
+            if(CountPlayersInRange()<=1) return false;
+            return true;
+        }
+
+        private bool InInteractRange(PlayerController player)
+        {
+            if (player == null) return false;
+            if (config == null) return false;
+            if(!player.IsAlive()) return false;
+            if(player.HeldItem() != null && player.HeldItem().type == CarryableType.BODY) return false;
+            if(GetDistanceToPlayer(player) < config.interactionDistance)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public int CountPlayersInRange()
+        {
+            int count = 0;
+
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5);
+            
+            foreach (Collider hitCollider in hitColliders)
+            {   
+                if(hitCollider.tag == "player hitbox" && InInteractRange(hitCollider.GetComponentInParent<PlayerController>()))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public bool CanInteract(PlayerController player)
+        {
+            if(!InInteractRange(player)) return false;
+            if(GetComponentInChildren<IInteractCondition>() != null)
+            {
+                if(!GetComponentInChildren<IInteractCondition>().CanInteract(player))
+                {
+                    return false;
+                }
+            }
+
+            if(status == InteractionStatus.FREE || playerId == player.netIdentity)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void Interact(PlayerController player)
+        {
+            if(!CanInteract(player)) return;
+            this.playerId = player.netIdentity;
+            this.interactionTimer = config.interactionTime;
+            this.status = InteractionStatus.INTERACTING;
         }
     }
 }

@@ -18,6 +18,7 @@ namespace SoleHeir
             {
                 if(spawned == false)
                 {
+                    
                     Random.InitState(System.DateTime.Now.Millisecond);
                     UnityEngine.Object[] spawners = GameObject.FindGameObjectsWithTag("SpawnLocation");
                     if(spawners.Length > 0)
@@ -35,8 +36,10 @@ namespace SoleHeir
 
         void Start()
         {
-
-
+            if(isServer)
+            {
+                GetComponentInChildren<PlayerIdentity>().Create("NPC");
+            }
         }
     }
 }

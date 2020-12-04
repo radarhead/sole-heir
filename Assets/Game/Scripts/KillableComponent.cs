@@ -40,6 +40,10 @@ namespace SoleHeir
                 GameObject corpse = Instantiate(carryablePrefab, body.position, body.rotation);
                 corpse.GetComponent<Carryable>().type = CarryableType.BODY;
                 corpse.GetComponent<Carryable>().entityName = bodyResource;
+                if(GetComponent<PlayerIdentity>() != null)
+                {
+                    GetComponent<PlayerIdentity>().Clone(corpse.GetComponent<PlayerIdentity>());
+                }
                 NetworkServer.Spawn(corpse);
                 corpse.GetComponentInChildren<Rigidbody>().AddForce(deathVector.normalized*200, ForceMode.Impulse);
 

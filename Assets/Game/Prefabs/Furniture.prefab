@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2267068496793260736}
   - component: {fileID: 364341488900337956}
   - component: {fileID: -2199961177407557970}
+  - component: {fileID: 8535474808256543181}
+  - component: {fileID: 6793028745721972459}
   m_Layer: 9
   m_Name: Furniture
   m_TagString: Untagged
@@ -65,10 +67,6 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   resourcesIndex: 0
-  spawnerPrefab: {fileID: 8612332323232293630, guid: 38742636aa2778249ac0cdb1466ec5b0,
-    type: 3}
-  interactorPrefab: {fileID: 2832857116542377447, guid: 8af554a099aa76141833928c5102862e,
-    type: 3}
   room: {fileID: 0}
 --- !u!114 &364341488900337956
 MonoBehaviour:
@@ -103,3 +101,39 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   size: 0
+--- !u!114 &8535474808256543181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413115566823792527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07ace2034430c154db89401297937c6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  config: {fileID: 0}
+  playerId: {fileID: 0}
+  status: 0
+  interactionTimer: 0
+  interactableDisplay: {fileID: 0}
+  displayHideTimer: 0
+--- !u!114 &6793028745721972459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413115566823792527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3183596db98f6fb4d98692cc7861a5f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactableDisplay: {fileID: 0}
+  fadeInTimer: 0
+  interactFadeTimer: 0
+  interactTimer: 0

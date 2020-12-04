@@ -7,7 +7,7 @@ namespace SoleHeir
 {
     public class BulletController : NetworkBehaviour
     {
-        public GameObject playerIdentity;
+        public NetworkIdentity playerIdentity;
 
         public float damage;
 
