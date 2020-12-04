@@ -10,31 +10,31 @@
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.ColorShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"20c2e3b6-2f80-4b34-a72d-23f2dcefa6b9\"\n    },\n    \"m_Name\": \"Dark Color\",\n    \"m_DefaultReferenceName\": \"Color_822F07AD\",\n    \"m_OverrideReferenceName\": \"_DarkColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.0,\n        \"g\": 0.0,\n        \"b\": 0.0,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"20c2e3b6-2f80-4b34-a72d-23f2dcefa6b9\"\n    },\n    \"m_Name\": \"Dark Color\",\n    \"m_DefaultReferenceName\": \"Color_822F07AD\",\n    \"m_OverrideReferenceName\": \"_DarkColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.17924529314041139,\n        \"g\": 0.0,\n        \"b\": 0.0,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
         },
         {
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.ColorShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"b0037bbe-8abf-4d25-8102-0349086f2a87\"\n    },\n    \"m_Name\": \"Dark Accent Color\",\n    \"m_DefaultReferenceName\": \"Color_93A62847\",\n    \"m_OverrideReferenceName\": \"_DarkAccentColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.0,\n        \"g\": 0.0,\n        \"b\": 0.0,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"b0037bbe-8abf-4d25-8102-0349086f2a87\"\n    },\n    \"m_Name\": \"Dark Accent Color\",\n    \"m_DefaultReferenceName\": \"Color_93A62847\",\n    \"m_OverrideReferenceName\": \"_DarkAccentColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.35849058628082278,\n        \"g\": 0.0,\n        \"b\": 0.0,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
         },
         {
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.ColorShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"d46ac5d5-9e5c-4079-87b3-495aec998600\"\n    },\n    \"m_Name\": \"Primary Color\",\n    \"m_DefaultReferenceName\": \"Color_2FE9C022\",\n    \"m_OverrideReferenceName\": \"_PrimaryColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.0,\n        \"g\": 0.0,\n        \"b\": 0.0,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"d46ac5d5-9e5c-4079-87b3-495aec998600\"\n    },\n    \"m_Name\": \"Primary Color\",\n    \"m_DefaultReferenceName\": \"Color_2FE9C022\",\n    \"m_OverrideReferenceName\": \"_PrimaryColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.5471698045730591,\n        \"g\": 0.24563506245613099,\n        \"b\": 0.033552881330251697,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
         },
         {
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.ColorShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"0585b278-43a8-4ec8-bd37-093ff7f9c297\"\n    },\n    \"m_Name\": \"Light Accent Color\",\n    \"m_DefaultReferenceName\": \"Color_7E8EBFF5\",\n    \"m_OverrideReferenceName\": \"_LightAccentColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.0,\n        \"g\": 0.0,\n        \"b\": 0.0,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"0585b278-43a8-4ec8-bd37-093ff7f9c297\"\n    },\n    \"m_Name\": \"Light Accent Color\",\n    \"m_DefaultReferenceName\": \"Color_7E8EBFF5\",\n    \"m_OverrideReferenceName\": \"_LightAccentColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.7092943787574768,\n        \"g\": 0.7358490228652954,\n        \"b\": 0.4269312918186188,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
         },
         {
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.ColorShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"614363ea-2cfe-4b7b-a248-aa13d62ff1d1\"\n    },\n    \"m_Name\": \"Light Color\",\n    \"m_DefaultReferenceName\": \"Color_83A06339\",\n    \"m_OverrideReferenceName\": \"_LightColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.0,\n        \"g\": 0.0,\n        \"b\": 0.0,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"614363ea-2cfe-4b7b-a248-aa13d62ff1d1\"\n    },\n    \"m_Name\": \"Light Color\",\n    \"m_DefaultReferenceName\": \"Color_83A06339\",\n    \"m_OverrideReferenceName\": \"_LightColor\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.6094207167625427,\n        \"g\": 0.8679245114326477,\n        \"b\": 0.47899606823921206,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
         },
         {
             "typeInfo": {
