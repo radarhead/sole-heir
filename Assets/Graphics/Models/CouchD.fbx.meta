@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 72d0359be1e7b7b479bac5a4af14a852
+guid: 981e27b66c17f48478cb080c22102aee
 ModelImporter:
   serializedVersion: 19301
   internalIDToNameTable: []
@@ -7,18 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Black Unlit
-    second: {fileID: 2100000, guid: da65cb0023758c6438d0408226e4d530, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
       name: Detail
     second: {fileID: 2100000, guid: 12b0aa6160763264c89560af5bd563c6, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Purple Unlit
-    second: {fileID: 2100000, guid: 4e677015cd1fc5241b0a5720f746ef5c, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
@@ -55,9 +45,9 @@ ModelImporter:
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
     importVisibility: 1
-    importBlendShapes: 0
-    importCameras: 0
-    importLights: 0
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0

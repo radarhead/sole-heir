@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Sprite Cutout
+  m_Name: Detail Sprite Cutout
   m_Shader: {fileID: -6465566751694194690, guid: d535320e69d63ab44b9d33b254ef0177,
     type: 3}
   m_ShaderKeywords: 
