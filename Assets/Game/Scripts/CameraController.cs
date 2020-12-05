@@ -15,18 +15,20 @@ namespace SoleHeir
         private Vector3 realPosition = Vector3.zero;
         public Vector3 offset;
         public Vector3 rotation;
-        private Vector3 currentRoom;
+        private Vector3 currentRoomCenter;
         private Vector3 targetPosition;
         private Vector3 targetOffset = new Vector3(0,0,-10);
         private Vector3 velocity = Vector3.zero;
         public float bottomY = 0;
         public float bottomYOffset = -1;
 
+        Camera camera;
 
 
         // Start is called before the first frame update
         void Awake()
         {
+            camera = GetComponent<Camera>();
             if(instance == null)
             {
                 instance = this;
@@ -40,6 +42,8 @@ namespace SoleHeir
         // Update is called once per frame
         void FixedUpdate()
         {
+            transform.rotation = Quaternion.Euler(rotation);
+
             screenShake = Mathf.Max(0f, screenShake - Time.deltaTime*screenShakeVelocity);
 
             // Find the local player
@@ -56,18 +60,36 @@ namespace SoleHeir
                 RoomGenerator roomGenerator = player.GetComponent<AnonymousComponent>().currentRoom;
                 if(roomGenerator != null)
                 {
-                    currentRoom = (roomGenerator.topRight + roomGenerator.bottomLeft) / 2;
-                    bottomY = roomGenerator.bottomLeft.z;
+                    Vector3 oldPosition = transform.position;
+
+                    currentRoomCenter = (roomGenerator.topRight + roomGenerator.bottomLeft) / 2;
                     targetOffset = offset + new Vector3(0,0, -Vector3.Distance(roomGenerator.bottomLeft, roomGenerator.topRight)/4);
+                    targetPosition = ((player.transform.position*2 + currentRoomCenter) / 3) + transform.rotation*targetOffset;
+
+                    
+
                                 
-                    transform.rotation = Quaternion.Euler(rotation);
-                    targetPosition = ((player.transform.position*2 + currentRoom) / 3) + transform.rotation*targetOffset;
-                    targetPosition = new Vector3(targetPosition.x, targetPosition.y, Math.Max(targetPosition.z, bottomY + bottomYOffset));
+
+
+
+
+
+                    bottomY = roomGenerator.bottomLeft.z;
+                    Ray r = camera.ViewportPointToRay(new Vector2(0,0));
+                    Plane bottomPlane = new Plane(Vector3.up, Vector3.zero);
+                    float enter = 0f;
+                    if(bottomPlane.Raycast(r, out enter))
+                    {
+                        bottomYOffset = (r.origin*enter).z;
+                    }
+
+                    targetPosition = new Vector3(targetPosition.x, targetPosition.y, Math.Max(targetPosition.z, bottomY - roomGenerator.roomSpacing/2));
                     realPosition = Vector3.SmoothDamp(realPosition, targetPosition, ref velocity, smoothTime);
                     transform.position = realPosition + new Vector3(
                         UnityEngine.Random.Range(-screenShake, screenShake),
                         0,
                         UnityEngine.Random.Range(-screenShake, screenShake));
+                    //transform.LookAt(player.transform, Vector3.up);
                 }
             }
         }

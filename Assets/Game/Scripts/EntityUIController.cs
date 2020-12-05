@@ -174,7 +174,7 @@ namespace SoleHeir
         }
         void SetDisplayPosition()
         {
-            if(interactableDisplay != null)
+            if(interactableDisplay != null && GetComponentInChildren<Collider>() != null)
             {
                 interactableDisplay.transform.rotation = Quaternion.identity;
                 interactableDisplay.transform.GetChild(0).position = Camera.main.WorldToScreenPoint(GetComponentInChildren<Collider>().bounds.center + new Vector3(0, GetComponentInChildren<Collider>().bounds.size.y/2, 0));

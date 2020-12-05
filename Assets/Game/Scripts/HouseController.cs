@@ -105,9 +105,9 @@ namespace SoleHeir
                             Time.deltaTime*10
                         )
                     );
-                    Shader.SetGlobalColor("_LightColor",
+                    Shader.SetGlobalColor("_LoghtColor1",
                         Color.Lerp(
-                            Shader.GetGlobalColor("_LightColor"),
+                            Shader.GetGlobalColor("_LoghtColor1"),
                             pc.anonymousComponent.currentRoom.colorPalette.Light(),
                             Time.deltaTime*10
                         )

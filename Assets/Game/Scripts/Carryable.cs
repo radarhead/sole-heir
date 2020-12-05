@@ -5,7 +5,7 @@ using Mirror;
 
 namespace SoleHeir
 {
-    public class Carryable : NetworkBehaviour
+    public class Carryable : NetworkParentWithAttributes
     {
         public GameObject prefab;
         public EntityUIController uiController;
@@ -15,7 +15,6 @@ namespace SoleHeir
         [SyncVar] private bool isChanged = false;
         [SyncVar] public int inventorySpace;
         [SyncVar] public NetworkIdentity owner;
-        [SyncVar] private int bools=0;
         
         //SyncDictionary<short, bool> boolTable = new SyncDictionary<short, bool>();
 
@@ -161,17 +160,6 @@ namespace SoleHeir
                 NetworkServer.Destroy(gameObject);
             }
             isChanged = false;
-        }
-
-        public bool GetBool(int idx)
-        {
-            return (bools & 1 << (idx)) != 0;
-        }
-
-        public void SetBool(int idx, bool value)
-        {
-            if(value) bools |= (1 << idx);
-            else bools &= ~(1 << idx);
         }
     }
 

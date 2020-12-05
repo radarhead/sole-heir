@@ -57,6 +57,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_AD7E5744_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 7e1517279d7e0d440aa2c8431074ec83, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -66,7 +70,7 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
-    - _ColorState: 3.07
+    - _ColorState: 3
     - _Cull: 2
     - _Cutoff: 0.5
     - _Dark: 0

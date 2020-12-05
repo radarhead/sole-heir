@@ -72,10 +72,10 @@ namespace SoleHeir
             bottomWall.transform.localScale = new Vector3(1,-1,1);
 
             //Make bottom wall invisible
-            /*foreach(var item in bottomWall.GetComponentsInChildren<MeshRenderer>())
+            foreach(var item in bottomWall.GetComponentsInChildren<MeshRenderer>())
             {
                 item.enabled = false;
-            }*/
+            }
 
 
             GameObject top = transform.Find("Top").gameObject;
