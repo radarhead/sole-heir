@@ -7,7 +7,7 @@ namespace SoleHeir
 {
     public class PlayerIdentity : NetworkBehaviour
     {
-        [SyncVar] private int id = -1;
+        [SyncVar] public int id = -1;
         PlayerIdentitySystem playerIdentitySystem;
 
         void Awake()

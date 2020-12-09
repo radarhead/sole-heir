@@ -8,37 +8,61 @@ namespace SoleHeir
     [ExecuteAlways]
     public class ToonOutline : MonoBehaviour
     {
-        private float offset = 0.05f;
-        void Awake()
+        private float offset = 0.04f;
+        private float boilAmt = 0.6f;
+        public Material material;
+        public Mesh mesh;
+        public bool refresh = false;
+        private Mesh m_mesh;
+        private Mesh newMesh;
+        void Update()
         {
-            Material material = Resources.Load("Entity Outline") as Material;
-            material.SetFloat("_OutlineOffset", offset);
-
-            foreach (MeshRenderer r in GetComponentsInChildren<MeshRenderer>())
+            RenderObject();
+            if(material == null)
             {
-                r.sharedMaterials = new Material[] {r.sharedMaterial, material};
-                
-                if(Application.isPlaying)
+                material = Resources.Load<Material>("Entity Outline");
+            }
+            if(mesh == null)
+            {
+                foreach(MeshFilter mf in GetComponents<MeshFilter>())
                 {
-                    MeshCollider c = r.GetComponent<MeshCollider>();
-                    if(c!=null)
-                    {
-                        Mesh newMesh = Instantiate(c.sharedMesh) as Mesh;
-
-                        Vector3[] verts = new Vector3[newMesh.vertices.Length];
-                        for (int i = 0; i < newMesh.vertices.Length; i++)
-                        {
-                            verts[i] = c.transform.InverseTransformPoint(c.transform.TransformPoint(c.sharedMesh.vertices[i]) + 
-                                c.transform.TransformDirection(c.sharedMesh.normals[i]).normalized * offset*1.31f);
-                        }
-
-                        newMesh.SetVertices(verts);
-                        c.sharedMesh = newMesh;
-                    }
+                    mesh = mf.sharedMesh;
                 }
             }
 
+            else if (m_mesh != mesh || refresh == true)
+            {
+                newMesh = Instantiate(mesh) as Mesh;
 
+                if(mesh.normals.Length != mesh.vertices.Length) return;//
+
+                Vector3[] verts = new Vector3[mesh.vertices.Length];
+                for (int i = 0; i < mesh.vertices.Length; i++)
+                {
+                    verts[i] = transform.InverseTransformPoint(transform.TransformPoint(mesh.vertices[i]) + 
+                        transform.TransformDirection(mesh.normals[i]).normalized * offset*(1+boilAmt));
+                }
+
+                newMesh.SetVertices(verts);
+                foreach(MeshCollider c in GetComponents<MeshCollider>())
+                {
+                    c.sharedMesh = newMesh;
+                }
+                m_mesh = mesh;
+                refresh = false;
+            }
+
+        }
+
+        void RenderObject() {
+            if(newMesh == null || material == null) return;
+            material.SetFloat("_OutlineOffset", boilAmt*offset);
+            Graphics.DrawMesh(newMesh, transform.localToWorldMatrix, material, 1);
+        }
+
+        void OnPostRender()
+        {
+            RenderObject();
         }
     }
 }

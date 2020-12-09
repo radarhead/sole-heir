@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: -6917278831728731195}
   - component: {fileID: 2685654510038937852}
   - component: {fileID: -1489786348739946311}
-  - component: {fileID: -1351874912680166305}
   m_Layer: 10
   m_Name: Carryable
   m_TagString: Untagged
@@ -53,6 +52,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   prefab: {fileID: 8047647315768830398}
+  uiController: {fileID: 0}
   type: 0
   entityName: 
   inventorySpace: 0
@@ -139,6 +139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  id: -1
 --- !u!114 &-1489786348739946311
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,24 +155,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   config: {fileID: 0}
+  uiController: {fileID: 0}
   playerId: {fileID: 0}
   status: 0
   interactionTimer: 0
-  interactableDisplay: {fileID: 0}
-  displayHideTimer: 0
---- !u!114 &-1351874912680166305
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8047647315768830398}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3183596db98f6fb4d98692cc7861a5f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactableDisplay: {fileID: 0}
-  fadeInTimer: 0
-  interactFadeTimer: 0
-  interactTimer: 0

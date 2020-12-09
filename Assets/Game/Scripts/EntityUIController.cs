@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -14,6 +14,7 @@ namespace SoleHeir
         private bool pickUp = false;
 
         private bool sabotage = false;
+        private bool kit = false;
 
         public string text1 = null;
         public string text2=null;
@@ -29,16 +30,7 @@ namespace SoleHeir
 
         void Update()
         {
-            if(GetComponentInParent<PlayerController>() != null)
-            {
-                if(interactableDisplay != null)
-                {
-                    Destroy(interactableDisplay);
-                }
-                return;
-            }
-
-            if(interact || pickUp || sabotage)
+            if(interact || pickUp || sabotage || kit)
             {
                 fade = Mathf.Min(1f, fade + Time.deltaTime*5);
             }
@@ -88,15 +80,7 @@ namespace SoleHeir
                     interactCircle = true;
                 }
 
-                // If the item can be sabotaged
-                if(ic.interactAction is CorpseInteraction)
-                {
-                    SetTextVars("(E) Use");
-                    if(ic.CountPlayersInRange() == 1)
-                    {
-                        SetTextVars("Need 2+ Players");
-                    }
-                }
+                
 
                 else if(ic.interactAction is InventoryInteraction)
                 {
@@ -125,18 +109,64 @@ namespace SoleHeir
                 }
             }
 
+            if(kit)
+            {
+                PlayerController pc = ClientScene.localPlayer.GetComponent<PlayerController>();
+                KitController kit =  pc.HeldItem().GetComponentInChildren<KitController>();
+                int remainingPlayers = kit.GetNeededPlayers();
+                if(remainingPlayers > 1)
+                {
+                    SetTextVars(String.Format("{0} Players Needed", remainingPlayers));
+                }
+                else if (remainingPlayers == 1)
+                {
+                    SetTextVars(String.Format("1 Player Needed", remainingPlayers));
+                }
+                else
+                {
+                    SetTextVars(String.Format("(E) Use", remainingPlayers));
+                }
+
+                //SetTextVars("(E) Use");
+                // If the item can be sabotaged
+                /*if(ic.interactAction is CorpseInteraction)
+                {
+                    SetTextVars("(E) Use");
+                    if(ic.CountPlayersInRange() == 1)
+                    {
+                        SetTextVars("Need 2+ Players");
+                    }
+                }*/
+            }
+
             if(pickUp)
             {
                 SetTextVars("(RMB) Pick Up");
             }
 
-            if(sabotage && ic!=null)
+            if(sabotage)
             {
                 interactCircle = true;
+                KitController myKit = null;
+
+                if(kit)
+                {
+                    myKit = ClientScene.localPlayer.GetComponent<PlayerController>().HeldItem().GetComponentInChildren<KitController>();
+                }
+                else
+                {
+                    myKit = GetComponentInChildren<KitController>();
+                }
+                if(myKit != null)
+                {
+                    a.SetFloat("interact progress", (myKit.GetFloat(ParentFloats.Timer)) / myKit.interactionTime);
+                }
+
+                
                 SetTextVars("(Q) Sabotage");
             }
 
-            if(interactCircle && ic.GetPlayer() != null)
+            if(interact && interactCircle && ic!=null && ic.GetPlayer() != null)
             {
                 a.SetFloat("interact progress", (ic.config.interactionTime-ic.interactionTimer) / ic.config.interactionTime);
             }
@@ -166,6 +196,7 @@ namespace SoleHeir
             interact = false;
             pickUp = false;
             sabotage = false;
+            kit = false;
         }
 
         void FixedUpdate()
@@ -194,6 +225,11 @@ namespace SoleHeir
         public void CanInteract()
         {
             interact = true;
+        }
+
+        public void CanKit()
+        {
+            kit = true;
         }
 
         private void SetTextVars(string text)

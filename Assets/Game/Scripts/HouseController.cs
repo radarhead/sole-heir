@@ -77,37 +77,37 @@ namespace SoleHeir
                 PlayerController pc = ClientScene.localPlayer.GetComponent<PlayerController>();
                 if(pc!=null &&pc.anonymousComponent.currentRoom != null)
                 {
-                    Shader.SetGlobalColor("_DarkColor",
+                    Shader.SetGlobalColor("_PaletteDarkColor",
                         Color.Lerp(
-                            Shader.GetGlobalColor("_DarkColor"),
+                            Shader.GetGlobalColor("_PaletteDarkColor"),
                             pc.anonymousComponent.currentRoom.colorPalette.Dark(),
                             Time.deltaTime*10
                         )
                     );
-                    Shader.SetGlobalColor("_DarkAccentColor",
+                    Shader.SetGlobalColor("_PaletteDarkAccentColor",
                         Color.Lerp(
-                            Shader.GetGlobalColor("_DarkAccentColor"),
+                            Shader.GetGlobalColor("_PaletteDarkAccentColor"),
                             pc.anonymousComponent.currentRoom.colorPalette.DarkAccent(),
                             Time.deltaTime*10
                         )
                     );
-                    Shader.SetGlobalColor("_PrimaryColor",
+                    Shader.SetGlobalColor("_PalettePrimaryColor",
                         Color.Lerp(
-                            Shader.GetGlobalColor("_PrimaryColor"),
+                            Shader.GetGlobalColor("_PalettePrimaryColor"),
                             pc.anonymousComponent.currentRoom.colorPalette.Primary(),
                             Time.deltaTime*10
                         )
                     );
-                    Shader.SetGlobalColor("_LightAccentColor",
+                    Shader.SetGlobalColor("_PaletteLightAccentColor",
                         Color.Lerp(
-                            Shader.GetGlobalColor("_LightAccentColor"),
+                            Shader.GetGlobalColor("_PaletteLightAccentColor"),
                             pc.anonymousComponent.currentRoom.colorPalette.LightAccent(),
                             Time.deltaTime*10
                         )
                     );
-                    Shader.SetGlobalColor("_LoghtColor1",
+                    Shader.SetGlobalColor("_PaletteLightColor",
                         Color.Lerp(
-                            Shader.GetGlobalColor("_LoghtColor1"),
+                            Shader.GetGlobalColor("_PaletteLightColor"),
                             pc.anonymousComponent.currentRoom.colorPalette.Light(),
                             Time.deltaTime*10
                         )

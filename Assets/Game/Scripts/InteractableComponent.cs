@@ -10,7 +10,6 @@ namespace SoleHeir
         public InteractableConfig config;
         public IInteractCondition interactCondition; 
         public IInteractAction interactAction; 
-        public ISabotageAction sabotageAction; 
         public EntityUIController uiController; 
 
         // Runtime
@@ -22,7 +21,6 @@ namespace SoleHeir
         {
             this.config = gameObject.GetComponentInChildren<InteractableConfig>();
             this.uiController = GetComponentInChildren<EntityUIController>();
-            this.sabotageAction = GetComponentInChildren<ISabotageAction>();
             this.interactAction = GetComponentInChildren<IInteractAction>();
             this.interactCondition = GetComponentInChildren<IInteractCondition>();
             if(config == null) this.enabled=false;
@@ -31,10 +29,8 @@ namespace SoleHeir
         {
             float oldInteractionTimer = interactionTimer;
             // Only reduce timer if you have to
-            if(sabotageAction == null || (sabotageAction != null && CountPlayersInRange() > 1))
-            {
-                interactionTimer = Mathf.Max(0, interactionTimer - Time.deltaTime);
-            }
+
+            interactionTimer = Mathf.Max(0, interactionTimer - Time.deltaTime);
             
             if(isServer)
             {
@@ -109,7 +105,6 @@ namespace SoleHeir
             if(!InInteractRange(player)) return false;
             if (GetComponentInChildren<ISabotageAction>() == null) return false;
             if(playerId == null) return false;
-            if(CountPlayersInRange()<=1) return false;
             return true;
         }
 
@@ -124,22 +119,6 @@ namespace SoleHeir
                 return true;
             }
             return false;
-        }
-
-        public int CountPlayersInRange()
-        {
-            int count = 0;
-
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5);
-            
-            foreach (Collider hitCollider in hitColliders)
-            {   
-                if(hitCollider.tag == "player hitbox" && InInteractRange(hitCollider.GetComponentInParent<PlayerController>()))
-                {
-                    count++;
-                }
-            }
-            return count;
         }
 
         public bool CanInteract(PlayerController player)

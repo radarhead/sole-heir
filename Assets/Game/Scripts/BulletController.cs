@@ -16,6 +16,7 @@ namespace SoleHeir
         public uint trailId=0;
         [SyncVar] public NetworkIdentity trail;
         public GameObject particlePrefab;
+        public int attacker;
         // Start is called before the first frame update
         void Start()
         {
@@ -63,7 +64,7 @@ namespace SoleHeir
                     KillableComponent killable = contact.otherCollider.GetComponentInParent<KillableComponent>();
                     if(killable != null)
                     {
-                        killable.DealDamage(damage, (angle).normalized );
+                        killable.DealDamage(damage, (angle).normalized, attacker);
                         Collide(contact);
                         return;
                     }

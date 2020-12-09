@@ -76,14 +76,8 @@ namespace SoleHeir
 
         void Update()
         {
-            if(room.GetComponent<RoomGenerator>().isLocalRoom)
-            {
-                shape.settings.fillColor = Color.white;
-            }
-            else
-            {
-                shape.settings.fillColor = Color.black;
-            }
+            shape.settings.fillColor = Shader.GetGlobalColor("_PaletteDarkAccentColor");
+            shape.settings.outlineColor = Shader.GetGlobalColor("_PaletteDarkColor");
         }
     }
 

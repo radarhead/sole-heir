@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7833216534057079864}
   - component: {fileID: 5603363197639335858}
   - component: {fileID: 4333181284041146247}
+  - component: {fileID: 2369442282029160657}
   m_Layer: 8
   m_Name: Capsule
   m_TagString: player hitbox
@@ -60,7 +61,6 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: e7f71b62d32c2ce48a9bb3d60141b633, type: 2}
-  - {fileID: 2100000, guid: bfc0813c1c677c04c9718459b5444f0b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -94,7 +94,22 @@ MeshCollider:
   serializedVersion: 4
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 0}
+--- !u!114 &2369442282029160657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4014963123768716748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e411719ac4c60564dacb319e9ddbb894, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: bfc0813c1c677c04c9718459b5444f0b, type: 2}
+  mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  refresh: 0
 --- !u!1 &6783063858549230160
 GameObject:
   m_ObjectHideFlags: 0
@@ -114,7 +129,6 @@ GameObject:
   - component: {fileID: 98512929519386963}
   - component: {fileID: 6781338223958027273}
   - component: {fileID: 4129535869247335036}
-  - component: {fileID: 5668702036380447527}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -162,6 +176,7 @@ MonoBehaviour:
   dodgeRollLag: 0.05
   carryablePrefab: {fileID: 8047647315768830398, guid: 677b18cbd77a75f418bbd8d380b98dd4,
     type: 3}
+  rotation: {x: 0, y: 0, z: 0, w: 1}
   status: 0
   gunPrefab: {fileID: 7812962003808045124, guid: 4684a66dbbefeec43b5cd6d2073a81e1,
     type: 3}
@@ -169,6 +184,7 @@ MonoBehaviour:
     type: 3}
   inventory: {fileID: 0}
   anonymousComponent: {fileID: 0}
+  playerIdentity: {fileID: 0}
   carriedItem: 0
 --- !u!114 &9189250713791446406
 MonoBehaviour:
@@ -191,6 +207,7 @@ MonoBehaviour:
   health: 0
   alive: 1
   playerIdentity: {fileID: 0}
+  lastPlayer: 0
   deathVector: {x: 0, y: 0, z: 0}
 --- !u!114 &8512274412745805060
 MonoBehaviour:
@@ -222,7 +239,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 80
   m_CollisionDetection: 2
 --- !u!114 &7351331430389796646
 MonoBehaviour:
@@ -398,15 +415,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
---- !u!114 &5668702036380447527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6783063858549230160}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e411719ac4c60564dacb319e9ddbb894, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  id: -1

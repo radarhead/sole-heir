@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 8409733896591658862}
   - component: {fileID: 1514586336594906802}
   - component: {fileID: 8681949121491217333}
+  - component: {fileID: 6034390333146669318}
+  - component: {fileID: 1622724230691626730}
   m_Layer: 0
   m_Name: Kit A
   m_TagString: Untagged
@@ -104,5 +106,34 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa7f9c7b30dd9c84a9faa2890e838b2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerCount: 1
+  interactionTime: 2
+--- !u!114 &6034390333146669318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073615813891837739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e411719ac4c60564dacb319e9ddbb894, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: bfc0813c1c677c04c9718459b5444f0b, type: 2}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  refresh: 0
+--- !u!114 &1622724230691626730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073615813891837739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de01407ec1880814ab93cb1339324cb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

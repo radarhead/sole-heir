@@ -3,13 +3,25 @@
     public enum PlayerStatus
     {
         FREE,
-        INTERACTING 
+        INTERACTING ,
+        KIT_INTERACTING
     }
 
     public enum InteractionStatus
     {
         FREE,
-        INTERACTING,
-        INTERACTING_HOLD
+        INTERACTING
+    }
+
+    public enum ParentBools
+    {
+        Used,
+        Sabotaged,
+        IsBeingUsedWithKit
+    }
+
+    public enum ParentFloats
+    {
+        Timer
     }
 }

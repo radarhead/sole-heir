@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4639543622130642917}
   - component: {fileID: 6840313383075106123}
   - component: {fileID: 1296251151376501200}
+  - component: {fileID: 7821307723496643562}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -94,6 +95,21 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7821307723496643562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940981433740945048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e411719ac4c60564dacb319e9ddbb894, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: bfc0813c1c677c04c9718459b5444f0b, type: 2}
+  mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  refresh: 0
 --- !u!1 &1374428744767992272
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,7 +126,7 @@ GameObject:
   - component: {fileID: 4927475826245105568}
   - component: {fileID: 6197963296907076015}
   - component: {fileID: 191060169509107958}
-  - component: {fileID: 7573545473705637578}
+  - component: {fileID: 3667979481809516894}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -188,6 +204,7 @@ MonoBehaviour:
   health: 0
   alive: 1
   playerIdentity: {fileID: 0}
+  lastPlayer: {fileID: 0}
   deathVector: {x: 0, y: 0, z: 0}
 --- !u!54 &-2248155697200809064
 Rigidbody:
@@ -256,7 +273,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentRoom: {fileID: 0}
   identity: {fileID: 0}
---- !u!114 &7573545473705637578
+  initialized: 0
+--- !u!114 &3667979481809516894
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -270,5 +288,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  name: 
-  color: {r: 0, g: 0, b: 0, a: 0}
+  id: -1

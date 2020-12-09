@@ -18,16 +18,19 @@ namespace SoleHeir
         [SyncVar] public float health;
         [SyncVar] public bool alive = true;
         [SyncVar] public NetworkIdentity playerIdentity;
+
+        public int lastPlayer;
         public Vector3 deathVector = Vector3.zero;
         void Start()
         {
             health = maxHealth;
         }
 
-        public void DealDamage(float damage, Vector3 deathVector)
+        public void DealDamage(float damage, Vector3 deathVector, int lastPlayer)
         {
             this.health -= damage;
             this.deathVector = deathVector;
+            this.lastPlayer = lastPlayer;
         }
 
         void Update()
@@ -45,6 +48,7 @@ namespace SoleHeir
                     GetComponent<PlayerIdentity>().Clone(corpse.GetComponent<PlayerIdentity>());
                 }
                 NetworkServer.Spawn(corpse);
+                corpse.GetComponent<NetworkParentWithAttributes>().SetInt((int)CorpseEnums.KILLER, lastPlayer);
                 corpse.GetComponentInChildren<Rigidbody>().AddForce(deathVector.normalized*200, ForceMode.Impulse);
 
                 GetComponent<KillableInterface>().KillMe();
