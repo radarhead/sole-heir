@@ -1,49 +1,81 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace SoleHeir {
     [ExecuteAlways]
     public class MeshLine : MonoBehaviour
     {
-        private Material material;
-        public Transform origin;
+        public Material material;
         private float offset = 0.05f;
-        Mesh mesh;
+        public Mesh mesh;
         int[] indices;
         Vector3[] vertices;
-        Vector3[][] edges;
-
+        int[][] edges;
+        List<Vector3> newVertices;
+        Mesh newMesh;
+        List<int> tris;
         void Start()
         {
+            
+            newMesh = new Mesh();
         }
 
         void Update()
         {
+            if(mesh == null)
+            {
+                this.mesh = GetComponent<MeshFilter>().sharedMesh;
+                
+            }
             if(material == null)
             {
                 this.material = Resources.Load<Material>("Inner Line");
-                this.mesh = GetComponent<MeshFilter>().sharedMesh;
-                this.origin = transform;
             }
-            
         }
 
+        void FixedUpdate()
+        {
+            
+        }
         void OnRenderObject()
         {
-            DrawMesh(mesh);
+            this.indices = mesh.GetIndices(0);
+            this.vertices = mesh.vertices;
+            newVertices = new List<Vector3>();
+            edges = new int[vertices.Length][];
+            tris = new List<int>();
+
+            for(int i = 0; i<indices.Length-2; i+=2)
+            {
+                int[] edge = GetEdge(i);
+                int[] edge2 = GetEdge(i+1);
+
+                tris.Add(edge[0]);
+                tris.Add(edge[1]);
+                tris.Add(edge2[1]);
+
+                tris.Add(edge2[1]);
+                tris.Add(edge2[0]);
+                tris.Add(edge[0]);
+            }
+            newMesh.SetVertices(newVertices.ToArray());
+            newMesh.SetTriangles(tris.ToArray(), 0);
+            material.SetPass(0);
+            Graphics.DrawMeshNow(newMesh, transform.localToWorldMatrix, 1);
         }
 
-        Vector3[] GetEdge(int i)
+        int[] GetEdge(int i)
         {
             if(edges[indices[i]] != null) return edges[indices[i]];
-            Vector3[] edge = new Vector3[2];
+            int[] edge = new int[2];
             
+            if(indices[i] + 1 >= vertices.Length) return edge;
             
             Vector3 vec = vertices[indices[i]];
-            Vector3 vec1 = vertices[indices[(i/2)*2]];
-            Vector3 vec2 = vertices[indices[(i/2)*2] + 1];
-
-            //Vector3 dirVec = (vertices[indices[(i/2)*2]]-vertices[indices[(i/2)*2 + 1]]).normalized;
+            Vector3 vec1 = vertices[indices[i]];
+            Vector3 vec2 = vertices[indices[i] + 1];
             Vector3 camVec = (
                  Camera.current.WorldToScreenPoint( transform.TransformPoint( vec1) ) -
                  Camera.current.WorldToScreenPoint( transform.TransformPoint(vec2) )
@@ -52,47 +84,17 @@ namespace SoleHeir {
             camVec = (Matrix4x4.Scale(new Vector3(1,1,0)) * camVec).normalized;
             Quaternion rotation = Camera.current.transform.rotation;
             Vector3 finalVec = ( transform.worldToLocalMatrix * Camera.current.transform.localToWorldMatrix * Vector3.Cross(camVec, Vector3.forward) )* offset/2;
-            edge[0] = vec + finalVec;
-            edge[1] = vec - finalVec;
             
-            edges[indices[i]] = edge;
+            newVertices.Add(vec + finalVec);
+            newVertices.Add(vec - finalVec);
+            
+            edge[0] = newVertices.Count-2;
+            edge[1] = newVertices.Count-1;
+            
             edges[indices[i]] = edge;
             return edge;
         }
-        void DrawMesh(Mesh mesh)
-        {
-            if(Camera.current == null) return;
-            if(mesh == null) return;
-            GL.Begin(GL.QUADS);
-            GL.PushMatrix();
-
-            //GL.LoadIdentity();
-
-            material.SetPass(0);
-            GL.Color(Color.black);
-
-            indices = mesh.GetIndices(0);
-            vertices = mesh.vertices;
-            edges = new Vector3[vertices.Length][];
-
-            float ro = offset;
-
-            for(int i = 0; i<indices.Length; i+=2)
-            {
-
-
-                Vector3[] edge1 = GetEdge(i);
-                Vector3[] edge2 = GetEdge(i+1);
-
-                GL.Vertex(transform.TransformPoint(edge1[0]));
-                GL.Vertex(transform.TransformPoint(edge1[1]));
-                GL.Vertex(transform.TransformPoint(edge2[1]));
-                GL.Vertex(transform.TransformPoint(edge2[0]));
-            }
-            
-            GL.End();
-            GL.PopMatrix();
-        }
+        
     }
 }
 

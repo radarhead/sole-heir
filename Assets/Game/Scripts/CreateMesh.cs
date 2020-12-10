@@ -154,7 +154,7 @@ namespace SoleHeir
             vertices.Add(new Vector3(end.x,0,end.y));
             vertices.Add(new Vector3(end.x,depth,end.y));
 
-            mesh.vertices = vertices.ToArray();;
+            mesh.vertices = vertices.ToArray();
 
             // Lower Left
             tris.Add(count+0);
