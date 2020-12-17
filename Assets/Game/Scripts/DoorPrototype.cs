@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using SoleHeir.GenerationUtils;
 using UnityEngine;
 
 namespace SoleHeir
@@ -7,25 +8,23 @@ namespace SoleHeir
     public class DoorPrototype : MonoBehaviour
     {
         public List<Vector2> outline;
+        public DoorType doorType;
 
-        void Start()
+        public void Initialize(float roomSpacing)
         {
-            RoomGenerator generator = gameObject.GetComponentInParent(typeof(RoomGenerator)) as RoomGenerator;
-            if(generator != null)
+            for(int i=1; i<outline.Count; i++)
             {
-                for(int i=1; i<outline.Count; i++)
-                {
-                    transform.Find("Wall").gameObject.GetComponent<CreateMesh>().AddMesh(outline[i], outline[i-1], generator.roomSpacing/2);
-                }
+                transform.Find("Wall").gameObject.GetComponent<CreateMesh>().AddMesh(outline[i], outline[i-1], roomSpacing/2);
             }
 
-            //for(float i=0; i<)
+            transform.Find("Door Spacing").localPosition = new Vector3(GetWidth()/2,1.5f,0);
+            transform.Find("Door Spacing").localScale = new Vector3(GetWidth(),3,2);
         }
         
 
         public float GetWidth()
         {
-            return(outline[0].x + outline[outline.Count-1].x);
+            return Mathf.Abs(outline[0].x + outline[outline.Count-1].x);
         }
 
         public float GetHeight()

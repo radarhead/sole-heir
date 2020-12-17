@@ -127,8 +127,6 @@ GameObject:
   - component: {fileID: 4678813167726175527}
   - component: {fileID: 3359284436149730122}
   - component: {fileID: 98512929519386963}
-  - component: {fileID: 6781338223958027273}
-  - component: {fileID: 4129535869247335036}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -183,9 +181,12 @@ MonoBehaviour:
   bulletPrefab: {fileID: 6497942227307708545, guid: 9d0e321d43f2b7b4ebca6eb3e2146d73,
     type: 3}
   inventory: {fileID: 0}
-  anonymousComponent: {fileID: 0}
-  playerIdentity: {fileID: 0}
+  killable: {fileID: 0}
   carriedItem: 0
+  nearestKitInteractable: {fileID: 0}
+  nearestSabotageable: {fileID: 0}
+  nearestInteractable: {fileID: 0}
+  nearestCarryable: {fileID: 0}
 --- !u!114 &9189250713791446406
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,20 +196,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6783063858549230160}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 369c9919b3b92bc48aab532e735e9cfe, type: 3}
+  m_Script: {fileID: 11500000, guid: a4cbe03003f21e14da6f4bdf808bba82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  carryablePrefab: {fileID: 8047647315768830398, guid: 677b18cbd77a75f418bbd8d380b98dd4,
-    type: 3}
-  maxHealth: 100
-  bodyResource: Player
-  health: 0
-  alive: 1
-  playerIdentity: {fileID: 0}
-  lastPlayer: 0
-  deathVector: {x: 0, y: 0, z: 0}
+  size: 4
 --- !u!114 &8512274412745805060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,12 +355,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 6783063858549230160}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 833aaa75bed291649b1a94eb62ab7825, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f9425b439fbb6f448e9e4e76be4666e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  size: 4
+  carryablePrefab: {fileID: 0}
+  maxHealth: 0
+  health: 0
+  alive: 1
+  playerIdentity: 0
+  lastPlayer: 0
+  deathVector: {x: 0, y: 0, z: 0}
 --- !u!114 &98512929519386963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -386,33 +385,3 @@ MonoBehaviour:
   lerpVelocityAmount: 0.5
   lerpPositionAmount: 0.5
   clientAuthority: 1
---- !u!114 &6781338223958027273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6783063858549230160}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f3fa4e5feaa8f841b79dc4471c0824b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentRoom: {fileID: 0}
-  identity: {fileID: 0}
-  initialized: 0
---- !u!114 &4129535869247335036
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6783063858549230160}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bde49932f2295c4ab1d974c7a5a1595, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  id: -1

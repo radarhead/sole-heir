@@ -26,19 +26,17 @@ namespace SoleHeir
                         int randVal = Random.Range(0, spawners.Length);
                         GameObject spawner = spawners[randVal] as GameObject;
                         this.transform.position = spawner.transform.position + new Vector3(1,0,1);
-                        Debug.Log(spawner.transform.position);
-                        Debug.Log(randVal);
                         spawned = true;
                     }
                 }
             }
         }
 
-        void Start()
+        void Awake()
         {
             if(isServer)
             {
-                GetComponentInChildren<PlayerIdentity>().Create("NPC");
+                
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 namespace SoleHeir
 {
@@ -22,13 +23,13 @@ namespace SoleHeir
         public float bottomY = 0;
         public float bottomYOffset = -1;
 
-        Camera camera;
+        Camera myCamera;
 
 
         // Start is called before the first frame update
         void Awake()
         {
-            camera = GetComponent<Camera>();
+            myCamera = GetComponent<Camera>();
             if(instance == null)
             {
                 instance = this;
@@ -47,17 +48,11 @@ namespace SoleHeir
             screenShake = Mathf.Max(0f, screenShake - Time.deltaTime*screenShakeVelocity);
 
             // Find the local player
-            GameObject player = null;
-            foreach (GameObject thisPlayer in GameObject.FindGameObjectsWithTag("Player"))
+            
+            if(ClientScene.localPlayer!=null)
             {
-                if(thisPlayer.GetComponent<PlayerController>().isLocalPlayer)
-                {
-                    player = thisPlayer;
-                }
-            }
-            if(player!=null)
-            {
-                RoomGenerator roomGenerator = player.GetComponent<AnonymousComponent>().currentRoom;
+                GameObject player = ClientScene.localPlayer.gameObject;
+                RoomGenerator roomGenerator = HelperMethods.FindCurrentRoom(ClientScene.localPlayer);
                 if(roomGenerator != null)
                 {
                     Vector3 oldPosition = transform.position;
@@ -66,16 +61,8 @@ namespace SoleHeir
                     targetOffset = offset + new Vector3(0,0, -Vector3.Distance(roomGenerator.bottomLeft, roomGenerator.topRight)/4);
                     targetPosition = ((player.transform.position*2 + currentRoomCenter) / 3) + transform.rotation*targetOffset;
 
-                    
-
-                                
-
-
-
-
-
                     bottomY = roomGenerator.bottomLeft.z;
-                    Ray r = camera.ViewportPointToRay(new Vector2(0,0));
+                    Ray r = myCamera.ViewportPointToRay(new Vector2(0,0));
                     Plane bottomPlane = new Plane(Vector3.up, Vector3.zero);
                     float enter = 0f;
                     if(bottomPlane.Raycast(r, out enter))

@@ -5,9 +5,14 @@ using UnityEngine;
 using Mirror;
 
 namespace SoleHeir {
-    public class GunController : MonoBehaviour
+    public class GunController : NetworkBehaviour
     {
-        void Update()
+        public float damage;
+        public float cooldownTime;
+        public float reloadTime;
+        public bool automatic;
+
+        public int ammo;        void Update()
         {
         }
     }

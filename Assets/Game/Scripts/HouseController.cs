@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using SoleHeir.GenerationUtils;
@@ -19,55 +19,69 @@ namespace SoleHeir
         // Start is called before the first frame update
         void Start()
         {
-
-        }
-
-        public override void OnStartServer()
-        {
-            UnityEngine.Random.InitState (seed);
-            prototypeHouse = new PrototypeHouse(seed, houseSize);
-            foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
+            foreach(Furniture furniture in Resources.LoadAll<Furniture>("Furniture"))
             {
-                GameObject room = (GameObject) GameObject.Instantiate(roomPrefab, transform);
-                room.GetComponent<RoomGenerator>().prototypeRoom = prototypeRoom;
-                room.GetComponent<RoomGenerator>().roomPosition = prototypeRoom.GetPosition();
-                NetworkServer.Spawn(room);
-
-                room.GetComponent<RoomGenerator>().InitializeGrid();
-                room.GetComponent<RoomGenerator>().Furnish();
-                room.GetComponent<RoomGenerator>().AddSpawner();
-                room.GetComponent<RoomGenerator>().BuildRoom(prototypeRoom);
-                
+                ClientScene.RegisterPrefab(furniture.gameObject);
             }
-            GameObject npc = Instantiate(npcPrefab, Vector3.zero, Quaternion.identity);     
-            NetworkServer.Spawn(npc);
-        }
 
-        public override void OnStartClient()
-        {
-            if(!isServer)
+            foreach(Carryable carryable in Resources.LoadAll<Carryable>("Carryable"))
+            {
+                ClientScene.RegisterPrefab(carryable.gameObject);
+            }
+
+            if(isServer)
             {
                 UnityEngine.Random.InitState (seed);
                 prototypeHouse = new PrototypeHouse(seed, houseSize);
                 foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
                 {
-                    foreach(RoomGenerator roomGenerator in Object.FindObjectsOfType<RoomGenerator>())
-                    {
-                        
-                        if(roomGenerator.roomPosition == prototypeRoom.GetPosition())
-                        {
-                            roomGenerator.BuildRoom(prototypeRoom);
-                        }
-                    }
+                    GameObject room = (GameObject) GameObject.Instantiate(roomPrefab, transform);
+                    room.GetComponent<RoomGenerator>().prototypeRoom = (prototypeRoom);
+                    room.GetComponent<RoomGenerator>().BuildRoom();
+                    NetworkServer.Spawn(room);
+                    Physics.SyncTransforms();
+                    room.GetComponent<RoomGenerator>().Furnish();
                 }
+                GameObject npc = Instantiate(npcPrefab, Vector3.zero, Quaternion.identity);
+                NetworkServer.Spawn(npc);
 
-                foreach(RoomGenerator roomGenerator in Object.FindObjectsOfType<RoomGenerator>())
-                {
-                    roomGenerator.transform.parent = transform;
-                }
+                SpawnItems();
             }
             
         }
+
+        void SpawnItems()
+        {
+            Carryable[] carryables = Resources.LoadAll<Carryable>("Carryables");
+
+            Inventory[] inventories = FurnitureManager.instance.GetComponentsInChildren<Inventory>();
+
+            Random.InitState(System.DateTime.Now.Millisecond);
+
+            while(inventories.Length > 1)
+            {
+                float sum = carryables.Sum(c => c.rarity);
+                float rarityValue = UnityEngine.Random.Range(0f, sum);
+                Carryable carryable = null;
+
+                foreach(var c in carryables) {
+                    rarityValue-=c.rarity;
+                    if(rarityValue<=0)
+                    {
+                        carryable = c;
+                        break;
+                    }
+                }
+
+                Carryable coolGuy = Instantiate(carryable);
+                NetworkServer.Spawn(coolGuy.gameObject);
+
+                Inventory inventory = inventories[Random.Range(0, inventories.Length)];
+                inventory.Insert(coolGuy);
+                inventories = inventories.Where(c => !c.IsFull()).ToArray();
+            }
+        }
+
 
         // Update is called once per frame
         void Update()
@@ -75,43 +89,49 @@ namespace SoleHeir
             if(ClientScene.localPlayer != null)
             {
                 PlayerController pc = ClientScene.localPlayer.GetComponent<PlayerController>();
-                if(pc!=null &&pc.anonymousComponent.currentRoom != null)
+                RoomGenerator currentRoom = HelperMethods.FindCurrentRoom(pc);
+                if(pc!=null &&currentRoom != null)
                 {
                     Shader.SetGlobalColor("_PaletteDarkColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PaletteDarkColor"),
-                            pc.anonymousComponent.currentRoom.colorPalette.Dark(),
+                            currentRoom.colorPalette.Dark(),
                             Time.deltaTime*10
                         )
                     );
                     Shader.SetGlobalColor("_PaletteDarkAccentColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PaletteDarkAccentColor"),
-                            pc.anonymousComponent.currentRoom.colorPalette.DarkAccent(),
+                            currentRoom.colorPalette.DarkAccent(),
                             Time.deltaTime*10
                         )
                     );
                     Shader.SetGlobalColor("_PalettePrimaryColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PalettePrimaryColor"),
-                            pc.anonymousComponent.currentRoom.colorPalette.Primary(),
+                            currentRoom.colorPalette.Primary(),
                             Time.deltaTime*10
                         )
                     );
                     Shader.SetGlobalColor("_PaletteLightAccentColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PaletteLightAccentColor"),
-                            pc.anonymousComponent.currentRoom.colorPalette.LightAccent(),
+                            currentRoom.colorPalette.LightAccent(),
                             Time.deltaTime*10
                         )
                     );
                     Shader.SetGlobalColor("_PaletteLightColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PaletteLightColor"),
-                            pc.anonymousComponent.currentRoom.colorPalette.Light(),
+                            currentRoom.colorPalette.Light(),
                             Time.deltaTime*10
                         )
                     );
+
+                    Shader.SetGlobalVector("_TopRight", currentRoom.topRight);
+                    Shader.SetGlobalVector("_BottomLeft", currentRoom.bottomLeft);
+                    Shader.SetGlobalInt("_LightsOut", currentRoom.lights ? 0 : 1);
+                    Shader.SetGlobalVector("_PlayerPosition", pc.transform.position);
                     
                 }
             }

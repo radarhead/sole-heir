@@ -16,10 +16,11 @@ namespace SoleHeir
                 (playerController = ClientScene.localPlayer.GetComponent<PlayerController>()) != null &&
                 (carryable = playerController.HeldItem()) != null &&
                 (kitController = carryable.GetComponentInChildren<KitController>()) != null &&
-                kitController.GetBool(ParentBools.Used)
+                kitController.used
             )
+        
             {
-                text.text = kitController.action.GetResult();
+                //text.text = kitController.GetString(ParentStrings.OnScreenText);
             }
             else
             {

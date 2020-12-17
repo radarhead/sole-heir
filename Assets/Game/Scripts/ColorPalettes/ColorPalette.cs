@@ -17,5 +17,6 @@ namespace SoleHeir
         public Color Primary(){return primary.GetColor();}
         public Color LightAccent(){return lightAccent.GetColor();}
         public Color Light(){return light.GetColor();}
+
     }
 }

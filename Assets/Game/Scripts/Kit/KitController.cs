@@ -1,48 +1,52 @@
-using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
 namespace SoleHeir
 {
-    public class KitController : NetworkChildWithAttributes
+    public class KitController : NetworkBehaviour
     {
         public int playerCount;
         public float interactionTime;
-        // References
-        Carryable carryable;
+        [HideInInspector] public Carryable carryable;
 
-        public IKitAction action;
+        [HideInInspector] public IKitAction action;
+        [HideInInspector] public float timer;
+        [HideInInspector] [SyncVar] public bool sabotaged;
+        [HideInInspector] [SyncVar] public bool used = false;
+
+        [HideInInspector] [SyncVar] private NetworkIdentity saboteurId;
+        [HideInInspector] public PlayerController saboteur {get{return saboteurId?.GetComponent<PlayerController>();} set{saboteurId = value?.netIdentity;}}
+
 
         void Awake()
         {
-            carryable = GetComponentInParent<Carryable>();
+            carryable = GetComponent<Carryable>();
             action = GetComponent<IKitAction>();
         }
 
         void Update()
         {
-            if(carryable.owner == null) return;
-            PlayerController player = carryable.owner.gameObject.GetComponent<PlayerController>();
-            // If the item is being held
-            if(player != null && player.carriedItem == carryable.inventorySpace)
-            {
-                if(!GetBool(ParentBools.Used))
-                {
-                    if(player.status == PlayerStatus.KIT_INTERACTING)
-                    {
-                        SetFloat(ParentFloats.Timer, Mathf.Max(0f, GetFloat(ParentFloats.Timer) - Time.deltaTime));
-                        if(GetFloat(ParentFloats.Timer) == 0f)
-                        {
-                            SetBool(ParentBools.Used, true);
-                        }
-                    }
-                    else
-                    {
-                        SetFloat(ParentFloats.Timer, interactionTime);
-                    }
-                }
-            }
+           
+        }
+
+        public void Sabotage(PlayerController pc)
+        {
+            this.sabotaged = true;
+            this.saboteur = pc;
+        }
+
+        public void Interact()
+        {
+            this.timer = interactionTime;
+            this.sabotaged = false;
+            this.saboteur = null;
+        }
+
+        public bool PreparedToSabotage()
+        {
+            return (!used && carryable?.inventory != null && carryable.inventory.TryGetComponent<PlayerController>(out var pc) && pc.nearestKitInteractable != null);
         }
 
         public int GetNeededPlayers()
@@ -53,19 +57,12 @@ namespace SoleHeir
         public int CountPlayersInRange()
         {
             int count = 0;
-
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 3);
             
-            foreach (Collider hitCollider in hitColliders)
-            {   
-                if(hitCollider.tag == "player hitbox")
-                {
-                    count++;
-                }
+            foreach (var player in PlayerManager.instance.GetComponentsInChildren<PlayerController>())
+            {
+                if(player.nearestSabotageable == this) count++;
             }
             return count;
         }
     }
-
-
 }

@@ -61,7 +61,7 @@ namespace SoleHeir
             {
                 foreach(ContactPoint contact in collision.contacts)
                 {
-                    KillableComponent killable = contact.otherCollider.GetComponentInParent<KillableComponent>();
+                    Killable killable = contact.otherCollider.GetComponentInParent<Killable>();
                     if(killable != null)
                     {
                         killable.DealDamage(damage, (angle).normalized, attacker);

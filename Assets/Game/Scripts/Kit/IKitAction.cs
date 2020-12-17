@@ -4,7 +4,7 @@ namespace SoleHeir
 {
     public interface IKitAction
     {
-        GameObject CanUse(GameObject go);
-        string GetResult();
+        bool CanUse(GameObject go);
+        void PerformAction(PlayerController player, GameObject target, bool sabotaged);
     }
 }

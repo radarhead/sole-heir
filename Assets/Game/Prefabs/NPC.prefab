@@ -125,8 +125,6 @@ GameObject:
   - component: {fileID: -2248155697200809064}
   - component: {fileID: 4927475826245105568}
   - component: {fileID: 6197963296907076015}
-  - component: {fileID: 191060169509107958}
-  - component: {fileID: 3667979481809516894}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -192,19 +190,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1374428744767992272}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 369c9919b3b92bc48aab532e735e9cfe, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f9425b439fbb6f448e9e4e76be4666e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  carryablePrefab: {fileID: 8047647315768830398, guid: 677b18cbd77a75f418bbd8d380b98dd4,
-    type: 3}
-  maxHealth: 1
-  bodyResource: Player
+  carryablePrefab: {fileID: 0}
+  maxHealth: 0
   health: 0
   alive: 1
-  playerIdentity: {fileID: 0}
-  lastPlayer: {fileID: 0}
+  playerIdentity: 0
+  lastPlayer: 0
   deathVector: {x: 0, y: 0, z: 0}
 --- !u!54 &-2248155697200809064
 Rigidbody:
@@ -259,33 +255,3 @@ MonoBehaviour:
   syncAngularVelocity: 1
   clearAngularVelocity: 0
   angularVelocitySensitivity: 0.1
---- !u!114 &191060169509107958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1374428744767992272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f3fa4e5feaa8f841b79dc4471c0824b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentRoom: {fileID: 0}
-  identity: {fileID: 0}
-  initialized: 0
---- !u!114 &3667979481809516894
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1374428744767992272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bde49932f2295c4ab1d974c7a5a1595, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  id: -1

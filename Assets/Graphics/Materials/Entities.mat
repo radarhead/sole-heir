@@ -70,15 +70,20 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Boolean_10D55747: 0
+    - Boolean_1C4E6012: 1
+    - Boolean_5B7356B: 0
+    - Boolean_E47079DE: 1
     - _AlphaClip: 0
     - _Blend: 0
     - _BlendOp: 0
+    - _Boiling: 0
     - _BumpScale: 1
     - _CameraFadingEnabled: 0
     - _CameraFarFadeDistance: 2
     - _CameraNearFadeDistance: 1
     - _ColorMode: 0
-    - _ColorState: 3
+    - _ColorState: 0
     - _Cull: 2
     - _Cutoff: 0.5
     - _DistortionBlend: 0.5
@@ -92,6 +97,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _LightsOut: 0
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1

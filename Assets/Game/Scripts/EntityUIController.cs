@@ -20,7 +20,7 @@ namespace SoleHeir
         public string text2=null;
         public GameObject text1Object;
         public GameObject text2Object;
-        public InteractableComponent ic;
+        public Interactable ic;
         public Animator a;
 
         void Start()
@@ -46,12 +46,10 @@ namespace SoleHeir
                     interactableDisplay = Instantiate(Resources.Load("Entity UI")) as GameObject;
                     text1Object = interactableDisplay.transform.Find("Group/Text 1").gameObject;
                     text2Object = interactableDisplay.transform.Find("Group/Text 2").gameObject;
-                    ic = GetComponent<InteractableComponent>();
+                    ic = GetComponent<Interactable>();
                     a = interactableDisplay.GetComponentInChildren<Animator>();
                     SetDisplayPosition();
-                    
                 }
-                
             }
             
             else
@@ -75,20 +73,19 @@ namespace SoleHeir
 
             if(interact && ic!=null)
             {
-                if(ic.GetPlayer() != null && ic.GetPlayer().isLocalPlayer)
+                if(ic.interactor != null && ic.interactor.isLocalPlayer && ic.interactionTimer != 0)
                 {
                     interactCircle = true;
                 }
 
-                
 
                 else if(ic.interactAction is InventoryInteraction)
                 {
                     Carryable pcItem = ClientScene.localPlayer.GetComponent<PlayerController>().HeldItem();
-                    Carryable inventoryItem = ic.GetComponentInParent<InventoryComponent>().Get(0);
+                    Carryable inventoryItem = ic.GetComponentInParent<Inventory>().Get(0);
                     if(pcItem == null && inventoryItem != null)
                     {
-                        SetTextVars(inventoryItem.entityName);
+                        SetTextVars(inventoryItem.name);
                         SetTextVars("(E) Take");
                     }
                     else if(pcItem != null && inventoryItem == null)
@@ -97,7 +94,7 @@ namespace SoleHeir
                     }
                     else if(pcItem != null && inventoryItem != null)
                     {
-                        SetTextVars(inventoryItem.entityName);
+                        SetTextVars(inventoryItem.name);
                         SetTextVars("(E) Swap");
                     }
                 }
@@ -126,17 +123,6 @@ namespace SoleHeir
                 {
                     SetTextVars(String.Format("(E) Use", remainingPlayers));
                 }
-
-                //SetTextVars("(E) Use");
-                // If the item can be sabotaged
-                /*if(ic.interactAction is CorpseInteraction)
-                {
-                    SetTextVars("(E) Use");
-                    if(ic.CountPlayersInRange() == 1)
-                    {
-                        SetTextVars("Need 2+ Players");
-                    }
-                }*/
             }
 
             if(pickUp)
@@ -159,16 +145,16 @@ namespace SoleHeir
                 }
                 if(myKit != null)
                 {
-                    a.SetFloat("interact progress", (myKit.GetFloat(ParentFloats.Timer)) / myKit.interactionTime);
+                    a.SetFloat("interact progress", myKit.timer / myKit.interactionTime);
                 }
 
                 
                 SetTextVars("(Q) Sabotage");
             }
 
-            if(interact && interactCircle && ic!=null && ic.GetPlayer() != null)
+            if(interact && interactCircle && ic!=null && ic.interactor != null)
             {
-                a.SetFloat("interact progress", (ic.config.interactionTime-ic.interactionTimer) / ic.config.interactionTime);
+                a.SetFloat("interact progress", (ic.interactionTime - ic.interactionTimer) / ic.interactionTime);
             }
 
             if(text1 != null)

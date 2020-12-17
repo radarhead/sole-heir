@@ -1,0 +1,116 @@
+{
+  "traits": [
+    {
+      "name": "Ice Cream Preference",
+      "outcome1": {
+        "description": "Prefers vanilla ice cream.",
+        "clue": "Traces of a white frozen treat were found on VICTIM's CLOTHING... Tasty."
+      },
+      "outcome2": {
+        "description": "Prefers chocolate ice cream.",
+        "clue": "Traces of a brown frozen treat were found on VICTIM's CLOTHING... Tasty."
+      }
+    },
+    {
+      "name": "Hair Color",
+      "outcome1": {
+        "description": "Dark hair.",
+        "clue": "Strands of dark hair were found on VICTIM's CLOTHING."
+      },
+      "outcome2": {
+        "description": "Light hair.",
+        "clue": "Strands of light hair were found on VICTIM's CLOTHING."
+      }
+    },
+    {
+      "name": "Handedness",
+      "outcome1": {
+        "description": "Left handed.",
+        "clue": "Injuries on VICTIM's left LR_PART indicate a left-handed killer."
+      },
+      "outcome2": {
+        "description": "Right handed.",
+        "clue": "Injuries on VICTIM's right LR_PART indicate a right-handed killer."
+      }
+    }
+  ],
+  "substitutions": [
+    {
+      "tag": "CLOTHING",
+      "values": [
+        "shirt",
+        "left shoe",
+        "right shoe",
+        "breast pocket",
+        "cravat",
+        "hairpin",
+        "handkerchief",
+        "corset",
+        "socks",
+        "pants",
+        "boxing gloves",
+        "mittens",
+        "waistcoat",
+        "suspenders",
+        "bonnet",
+        "trousers",
+        "belt buckle",
+        "overcoat",
+        "gloves",
+        "kilt",
+        "eyepatch",
+        "bow-tie",
+        "tie",
+        "vest",
+        "sneakers",
+        "top hat",
+        "petticoat",
+        "ear gauges"
+      ]
+    },
+    {
+      "tag": "BODYPART",
+      "values": [
+        "leg",
+        "arm",
+        "forearm",
+        "neck",
+        "forehead",
+        "elbow",
+        "big toe",
+        "ear",
+        "wisdom teeth",
+        "nose",
+        "eyelid",
+        "lips",
+        "knee",
+        "foot",
+        "breast",
+        "chest",
+        "abdomen",
+        "torso",
+        "fingernail",
+        "rear",
+        "thigh"
+      ]
+    },
+    {
+      "tag": "LR_PART",
+      "values": [
+        "earlobe",
+        "cheek",
+        "nostril",
+        "arm",
+        "leg",
+        "knee",
+        "thigh",
+        "shoulder",
+        "wrist",
+        "eye",
+        "ankle",
+        "big toe",
+        "index finger"
+      ]
+    }
+  ]
+}

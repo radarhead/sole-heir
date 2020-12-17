@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using SoleHeir.GenerationUtils;
@@ -7,11 +7,7 @@ namespace SoleHeir
 {
     public class WallGenerator : MonoBehaviour
     {
-        public GameObject doorGetter;
 
-        public float maxOpacity;
-        public int fadeDivisions;
-        // Start is called before the first frame update
         void Start()
         {
             
@@ -33,13 +29,16 @@ namespace SoleHeir
 
             float prevX = 0;
             float offset = width/2;
+
+            DoorPrototype[] doorArr = Resources.LoadAll<DoorPrototype>("Doors");
+
             foreach(PrototypeDoorway doorway in doors)
             {
                 if(doorway.other != null)
                 {
-                    GameObject door = GameObject.Instantiate(doorGetter.GetComponent<DoorGetter>().GetDoorType(doorway), transform.position, transform.localRotation);
+                    GameObject door = GameObject.Instantiate(doorArr.Where(e => e.doorType==doorway.doorType).First().gameObject, transform.position, transform.localRotation);
                     DoorPrototype doorPrototype = (DoorPrototype)door.GetComponent<DoorPrototype>();
-
+                    doorPrototype.Initialize(spacing);
                     float tempOffset = offset - doorPrototype.GetWidth()/2;
 
                     door.transform.parent = transform;
@@ -63,22 +62,6 @@ namespace SoleHeir
                 offset += width + spacing;
             }
 
-            GameObject fade = transform.Find("Fade").gameObject;
-            GameObject quad = transform.Find("Fade/Quad").gameObject;
-            
-            
-            for(int i=0; i<fadeDivisions; i++)
-            {
-                float z = 1f / fadeDivisions * i;
-                float opacity = 1f / fadeDivisions * (i);
-                GameObject newChild = GameObject.Instantiate(quad, fade.transform);
-                newChild.GetComponent<MeshRenderer>().material.SetFloat("_Alpha", opacity*maxOpacity);
-                newChild.transform.localPosition = new Vector3(0.5f,-0.5f,z);
-            }
-
-            GameObject.Destroy(quad);
-            fade.transform.localScale = new Vector3((width+spacing)*doors.Count - spacing, height, -spacing/2);
-            fade.transform.localRotation = Quaternion.Euler(-90,0,0);
             createMesh.AddMesh(new Vector2(prevX,0), new Vector2((width+spacing)*doors.Count-spacing, height));
             wallHat.transform.localRotation = Quaternion.Euler(90,0,0);
             createMesh2.AddMesh(

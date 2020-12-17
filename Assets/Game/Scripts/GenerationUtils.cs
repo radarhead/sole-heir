@@ -6,15 +6,16 @@ using UnityEngine;
 
 namespace SoleHeir.GenerationUtils
 {
+    [Serializable]
     public class PrototypeHouse
     {
         public int seed;
 
         public int houseSize;
 
-        public GenerationGrid<RoomType> statusGrid;
+        [NonSerialized] public GenerationGrid<RoomType> statusGrid;
 
-        public List<PrototypeRoom> rooms;
+        [NonSerialized] public List<PrototypeRoom> rooms;//
 
         public PrototypeHouse() {}
 
@@ -188,6 +189,8 @@ namespace SoleHeir.GenerationUtils
                     {
                         return;
                     }
+
+                    item.UpdateType();
                 }
 
                 foreach (PrototypeDoorway item in maxRoom.GetLeftDoorways())
@@ -196,6 +199,7 @@ namespace SoleHeir.GenerationUtils
                     {
                         maxDoorway = item;
                     }
+                    item.UpdateType();
                 }
             }
 
@@ -213,6 +217,7 @@ namespace SoleHeir.GenerationUtils
                     {
                         return;
                     }
+                    item.UpdateType();
                 }
 
                 foreach (var item in maxRoom.GetBottomDoorways())
@@ -221,6 +226,7 @@ namespace SoleHeir.GenerationUtils
                     {
                         maxDoorway = item;
                     }
+                    item.UpdateType();
                 }
             }
 
@@ -465,6 +471,7 @@ namespace SoleHeir.GenerationUtils
             return roomVectors;
         }
     }
+    [Serializable]
 
     public class PrototypeRoom
     {
@@ -476,7 +483,7 @@ namespace SoleHeir.GenerationUtils
 
         public int seed;
 
-        public PrototypeHouse house;
+        [NonSerialized] public PrototypeHouse house;
 
         public List<PrototypeDoorway> leftDoorways;
 
@@ -560,18 +567,30 @@ namespace SoleHeir.GenerationUtils
         }
     }
 
+    [Serializable]
     public class PrototypeDoorway
     {
-        public PrototypeRoom room;
+        [NonSerialized] public PrototypeRoom room;
 
         public Vector2Int position;
+        public DoorType doorType;
 
-        public PrototypeDoorway other = null;
+        [NonSerialized] public PrototypeDoorway other = null;
 
         public PrototypeDoorway(PrototypeRoom room, Vector2Int position)
         {
             this.room = room;
             this.position = position;
+        }
+
+        public void UpdateType()
+        {
+            if(room != null && other != null)
+            {
+                if(room.roomType == RoomType.SMALL || other.room.roomType == RoomType.SMALL) {this.doorType = DoorType.SMALL; other.doorType = DoorType.SMALL;}
+                else if (room.roomType == RoomType.HALLWAY || other.room.roomType == RoomType.HALLWAY) {this.doorType = DoorType.LARGE; other.doorType = DoorType.LARGE;}
+                else {this.doorType = DoorType.ARCHED; other.doorType = DoorType.ARCHED;}
+            }
         }
 
         public PrototypeDoorway() {}
@@ -717,6 +736,7 @@ namespace SoleHeir.GenerationUtils
         }
     }
 
+    [Serializable]
     public class GenerationPlane<T>
     {
         public T[] array;
@@ -792,5 +812,12 @@ namespace SoleHeir.GenerationUtils
         ROOM_WALL_TOP,
         ROOM_CORNER_LEFT,
         ROOM_CORNER_RIGHT
+    }
+
+    public enum DoorType
+    {
+        SMALL,
+        LARGE,
+        ARCHED
     }
 }

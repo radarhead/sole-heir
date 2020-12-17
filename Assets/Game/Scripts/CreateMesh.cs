@@ -14,18 +14,6 @@ namespace SoleHeir
         private List<int> tris;
 
 
-        // Start is called before the first frame update
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            
-        }
-
         public void AddMesh(float x1, float y1, float x2, float y2)
         {
             AddMesh(new Vector2(x1,y1), new Vector2(x2,y2));
