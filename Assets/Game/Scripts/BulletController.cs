@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -7,76 +7,59 @@ namespace SoleHeir
 {
     public class BulletController : NetworkBehaviour
     {
-        public NetworkIdentity playerIdentity;
-
+        private NetworkIdentity playerIdentity;
+        public PlayerController player {get {return playerIdentity?.GetComponent<PlayerController>();} set{playerIdentity = value.netIdentity;}}
         public float damage;
 
-        private Vector3 prevPos;
         private Vector3 angle;
-        public uint trailId=0;
-        [SyncVar] public NetworkIdentity trail;
-        public GameObject particlePrefab;
-        public int attacker;
+        public GameObject hole;
+        public GameObject bullet;
+        public Rigidbody body;
+
         // Start is called before the first frame update
+        void Awake()
+        {
+            this.body = GetComponent<Rigidbody>();
+            this.bullet = transform.Find("Bullet").gameObject;
+            this.hole = transform.Find("Hole").gameObject;
+        }
         void Start()
         {
-            angle = GetComponent<Rigidbody>().velocity;
-            prevPos = transform.position;
+            transform.parent = BulletManager.instance.transform;
+            angle = body.velocity;
             if(!isServer)
             {
-                gameObject.GetComponentInChildren<Rigidbody>().detectCollisions = false;
+                body.detectCollisions = false;
             }
-            
-            
-            else
-            {
-                GameObject trailObject = Instantiate(particlePrefab, BulletHoleSystem.instance.transform);
-                trailObject.transform.position = transform.position;
-                trailObject.GetComponent<BulletParticleController>().bullet = gameObject;
-                NetworkServer.Spawn(trailObject);
-                trail = trailObject.GetComponent<BulletParticleController>().netIdentity;
-            }
-        }
-
-        void Update()
-        {
-            /*RaycastHit hit;
-            if(Physics.Raycast(transform.position, angle, out hit, (transform.position - prevPos).magnitude))
-            {
-                Debug.Log(hit.distance);
-            }
-            prevPos = transform.position;*/
-        }
-
-        void Collide(ContactPoint contact)
-        {
-            trail.GetComponent<BulletParticleController>().RpcDetonate(contact.point, contact.normal);
-            Destroy(gameObject);
-            NetworkServer.Destroy(gameObject);
-            return;
         }
 
         void OnCollisionEnter(Collision collision) {
             if(isServer)
             {
-                foreach(ContactPoint contact in collision.contacts)
-                {
-                    Killable killable = contact.otherCollider.GetComponentInParent<Killable>();
-                    if(killable != null)
-                    {
-                        killable.DealDamage(damage, (angle).normalized, attacker);
-                        Collide(contact);
-                        return;
-                    }
-                }
+                Killable killable = null;
+                IShootable shootable = null;
 
-                if(collision.contacts.Length > 0)
+                foreach(var contact in collision.contacts)
                 {
-                    ContactPoint contact = collision.contacts[0];
-                    BulletHoleSystem.instance.SpawnHole(contact);
-                    Collide(contact);
+                    killable = killable ?? contact.otherCollider?.attachedRigidbody?.GetComponent<Killable>();
+                    shootable = shootable ?? contact.otherCollider?.attachedRigidbody?.GetComponent<IShootable>();
                 }
+                
+                killable?.DealDamage(damage, body.velocity, player.identity);
+                shootable?.Shoot(this);
+
+                body.detectCollisions = false;
+                transform.rotation = Quaternion.LookRotation(collision.contacts[0].normal, Vector3.up);
+                RpcCollide();
             }
+        }
+        
+        [ClientRpc]
+        void RpcCollide()
+        {
+            body.isKinematic=true;
+            hole.SetActive(true);
+            bullet.SetActive(false);
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using SoleHeir.GenerationUtils;
 using Mirror;
 
@@ -14,11 +15,14 @@ namespace SoleHeir
         public PrototypeHouse prototypeHouse;
         public GameObject npcPrefab;
         public GameObject roomPrefab;
+        public NavMeshSurface surface;
         public RoomGenerator playerRoom;
 
         // Start is called before the first frame update
         void Start()
         {
+            this.surface = GetComponent<NavMeshSurface>();
+
             foreach(Furniture furniture in Resources.LoadAll<Furniture>("Furniture"))
             {
                 ClientScene.RegisterPrefab(furniture.gameObject);
@@ -46,6 +50,9 @@ namespace SoleHeir
                 NetworkServer.Spawn(npc);
 
                 SpawnItems();
+
+                surface.BuildNavMesh();
+
             }
             
         }

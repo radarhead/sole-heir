@@ -10,7 +10,7 @@ Material:
   m_Name: Bullet Particle
   m_Shader: {fileID: -6465566751694194690, guid: 6c909e3249da89b4cb3957b0ef45a3ad,
     type: 3}
-  m_ShaderKeywords: _COLOROVERLAY_ON _FADING_ON _SOFTPARTICLES_ON
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA _COLOROVERLAY_ON _FADING_ON _SOFTPARTICLES_ON
   m_LightmapFlags: 6
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -72,6 +72,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - Boolean_10D55747: 0
+    - Boolean_1C4E6012: 0
     - Boolean_1FDAC4F0: 1
     - Boolean_5B7356B: 0
     - Boolean_E47079DE: 1

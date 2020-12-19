@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Mirror;
-using System;
 
 namespace SoleHeir
 {
@@ -13,21 +12,20 @@ namespace SoleHeir
         public float speed;
         public float smoothTime;
         public float rotationTime;
-        public float overlapRadius;
         public float rotationSpeed;
-        public float dodgeRollSpeed;
-        public float dodgeRollTime;
-        public float dodgeRollSlowDown;
-        public float dodgeRollLag;
-
+        public float airTime = 0.1f;
+        private float airTimer;
+        private float jumpTimer;
         // Timers
         float reloadTimer = 0;
         float rotationTimer = 0;
+        private bool bizzareGrounded;
+        private bool bizzareGroundedCheck {get {if(bizzareGrounded){bizzareGrounded=false;return true;}return false;} set{bizzareGrounded=value;}}
+
 
         public GameObject carryablePrefab;
         private Vector2 moveInput;
         private Vector3 acceleration = Vector3.zero;
-        private Vector2 cameraPosition = Vector2.zero;
         Vector3 aimTarget;
         [SyncVar] public Quaternion rotation = Quaternion.identity;
         [SyncVar] public PlayerStatus status;
@@ -39,6 +37,7 @@ namespace SoleHeir
         public GameObject bulletPrefab;
         public Inventory inventory;
         public Killable killable;
+        public int identity {get{return killable.playerIdentity;}}
         [SyncVar] public int carriedItem = 0;
 
         // Nearest objects
@@ -60,7 +59,23 @@ namespace SoleHeir
                 GetComponent<PlayerInput>().enabled = true;
             }
 
+            if(isServer)
+            {
+                var list = Object.FindObjectsOfType<NetworkStartPosition>();
+                transform.position = list[Random.Range(0, list.Length)].transform.position;
+            }
             inventory = GetComponent<Inventory>();
+        }
+
+        void OnCollisionStay(Collision collision)
+        {
+            foreach (var contact in collision.contacts)
+            {
+                if(Vector3.Dot(contact.normal, Vector3.up) > 0.5)
+                {
+                    bizzareGrounded = true;
+                }
+            }
         }
 
         public void OnMove(InputValue value)
@@ -135,9 +150,11 @@ namespace SoleHeir
             if(status != PlayerStatus.FREE) return;
             if (value.Get<float>() < 1f) return;
 
-            if(Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 0.1f, LayerMask.GetMask("House", "Furniture")))
+            if(airTimer>0 && jumpTimer == 0)
             {
-                body.velocity += new Vector3(0,5,0);
+                airTimer = -1;
+                jumpTimer = airTime;
+                body.velocity = new Vector3(body.velocity.x,5,body.velocity.z);
             }
         }
 
@@ -288,21 +305,23 @@ namespace SoleHeir
                 transform.GetComponent<Rigidbody>().AddForce(Quaternion.LookRotation(aimTarget) * new Vector3(0, 0, -200));
                 GameObject bullet = Instantiate(bulletPrefab, transform.position + new Vector3(0, 1, 0), body.rotation);
                 BulletController controller = bullet.GetComponent<BulletController>();
+                controller.player = this;
                 GunController config = HeldItem().GetComponent<GunController>();
                 controller.damage = config.damage;
                 Physics.IgnoreCollision(bullet.GetComponent<Collider>(), gameObject.GetComponentInChildren<Collider>());
                 bullet.GetComponent<Rigidbody>().velocity = body.rotation * new Vector3(0, 0, 80);
-                bullet.GetComponent<BulletController>().attacker = killable.playerIdentity;
                 reloadTimer = 0.3f;
                 NetworkServer.Spawn(bullet);
             }
         }
 
+
         // Update is called once per frame
         void Update()
         {
-            reloadTimer = Math.Max(0f, reloadTimer - Time.deltaTime);
-            rotationTimer = Math.Max(0f, rotationTimer - Time.deltaTime);
+            
+            reloadTimer = Mathf.Max(0f, reloadTimer - Time.deltaTime);
+            rotationTimer = Mathf.Max(0f, rotationTimer - Time.deltaTime);
             bool alive = IsAlive();
 
 
@@ -425,10 +444,22 @@ namespace SoleHeir
             nearestInteractable = GetNearestOfType<Interactable>(1.5f, c => c.CanInteract(this));
             nearestSabotageable = GetNearestOfType<KitController>(1.5f, c => c.PreparedToSabotage());
             nearestCarryable = GetNearestOfType<Carryable>(1.5f, c => c.inventory==null);
+
+            if(bizzareGroundedCheck)
+            {
+                airTimer = airTime;
+            }
+            else
+            {
+                airTimer = Mathf.Max(0, airTimer-Time.deltaTime);
+            }
+            jumpTimer = Mathf.Max(0, jumpTimer - Time.deltaTime);
         }
 
         void FixedUpdate()
         {
+            
+
             if(HeldItem() != null)
             {
                 HeldItem().transform.position = transform.position + rotation * new Vector3(0, 1, 1);
@@ -446,6 +477,8 @@ namespace SoleHeir
                 c.Spawn(body.velocity + Quaternion.LookRotation(aimTarget) * new Vector3(0, 5, 2));
             }
         }
+
+        
 
         public bool IsAlive()
         {
@@ -483,7 +516,7 @@ namespace SoleHeir
             return GetNearestOfType<T>(distance, c => true);
         }
 
-        public T GetNearestOfType<T>(float distance, Func<T, bool> validate) where T : MonoBehaviour
+        public T GetNearestOfType<T>(float distance, System.Func<T, bool> validate) where T : MonoBehaviour
         {
             // Set this to be in front of player.
             Vector3 startLocation = transform.position;

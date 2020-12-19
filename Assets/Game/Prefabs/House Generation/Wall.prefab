@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8962813216974137918}
   - component: {fileID: 7874770826372325517}
   - component: {fileID: 1547301251972394399}
+  - component: {fileID: 3668465005786211910}
   m_Layer: 11
   m_Name: WallBase
   m_TagString: Untagged
@@ -83,6 +84,20 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!64 &3668465005786211910
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1583428023310540993}
+  m_Material: {fileID: 13400000, guid: 4d2fed69aa3edf74eb6433d111730274, type: 2}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &2999292630721202140
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,7 +226,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39fb8539b97b19848afd052300eb35a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  doorGetter: {fileID: 1866106938529381744, guid: 200449751328f914f83fafcf26ad4617,
-    type: 3}
-  maxOpacity: 0.3
-  fadeDivisions: 20

@@ -8,10 +8,6 @@ namespace SoleHeir
     public class FloorGenerator : MonoBehaviour
     {
 
-        // Start is called before the first frame update
-        void Start()
-        {
-        }
 
         // Update is called once per frame
         void Update()
@@ -24,6 +20,7 @@ namespace SoleHeir
             float xSize = prototypeRoom.GetSize().x*(roomWidth+roomSpacing) - roomSpacing;
             float ySize = prototypeRoom.GetSize().y*(roomHeight+roomSpacing) - roomSpacing;
             createMesh.AddMesh(new Vector2(0,0), new Vector2(xSize,ySize));
+
 
             float offset;
 

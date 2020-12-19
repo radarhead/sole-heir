@@ -17,14 +17,6 @@ namespace SoleHeir
             }
         }
 
-        void Start()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                NewPIS("Sure");
-            }
-        }
-
         public PlayerIdentityStruct GetPIS(int id)
         {
             foreach (PlayerIdentityStruct pis in identities)
