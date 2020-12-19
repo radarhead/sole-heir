@@ -40,8 +40,8 @@ namespace SoleHeir
                 foreach (PrototypeRoom prototypeRoom in prototypeHouse.GetRooms())
                 {
                     GameObject room = (GameObject) GameObject.Instantiate(roomPrefab, transform);
-                    room.GetComponent<RoomGenerator>().prototypeRoom = (prototypeRoom);
-                    room.GetComponent<RoomGenerator>().BuildRoom();
+                    room.GetComponent<RoomGenerator>().SetPrototype(prototypeRoom);
+                    room.GetComponent<RoomGenerator>().Initialize();
                     NetworkServer.Spawn(room);
                     Physics.SyncTransforms();
                     room.GetComponent<RoomGenerator>().Furnish();
@@ -93,6 +93,7 @@ namespace SoleHeir
         // Update is called once per frame
         void Update()
         {
+
             if(ClientScene.localPlayer != null)
             {
                 PlayerController pc = ClientScene.localPlayer.GetComponent<PlayerController>();

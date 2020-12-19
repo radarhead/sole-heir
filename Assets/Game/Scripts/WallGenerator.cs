@@ -2,28 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SoleHeir.GenerationUtils;
+using Mirror;
 
 namespace SoleHeir
 {
     public class WallGenerator : MonoBehaviour
     {
 
-        void Start()
-        {
-            
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            
-        }
-
-        public void Initialize(List<PrototypeDoorway> doors, float width, float height, float spacing)
+        public void Initialize(List<int> doors, float width, float height, float spacing)
         {
             GameObject wallBase = transform.Find("WallBase").gameObject;
             GameObject wallHat = transform.Find("WallHat").gameObject;
-            //GameObject wallPaneling = transform.Find("WallPaneling").gameObject;
             CreateMesh createMesh = wallBase.GetComponent<CreateMesh>();
             CreateMesh createMesh2 = wallHat.GetComponent<CreateMesh>();
 
@@ -32,11 +21,12 @@ namespace SoleHeir
 
             DoorPrototype[] doorArr = Resources.LoadAll<DoorPrototype>("Doors");
 
-            foreach(PrototypeDoorway doorway in doors)
+            foreach(int doorIdx in doors)
             {
-                if(doorway.other != null)
+                if(doorIdx >= 0)
                 {
-                    GameObject door = GameObject.Instantiate(doorArr.Where(e => e.doorType==doorway.doorType).First().gameObject, transform.position, transform.localRotation);
+                    DoorType doorway = (DoorType)doorIdx;
+                    GameObject door = GameObject.Instantiate(doorArr.Where(e => e.doorType==doorway).First().gameObject, transform.position, transform.localRotation);
                     DoorPrototype doorPrototype = (DoorPrototype)door.GetComponent<DoorPrototype>();
                     doorPrototype.Initialize(spacing);
                     float tempOffset = offset - doorPrototype.GetWidth()/2;
@@ -70,10 +60,6 @@ namespace SoleHeir
                 new Vector2((width+spacing)*doors.Count-spacing,0),
                 new Vector2((width+spacing)*doors.Count-spacing/2,spacing/2));
             wallHat.transform.localPosition = new Vector3(0,0,height);
-
-            //Debug.Log(wallBase.GetComponent<MeshFilter>().mesh.GetVertices().Length);
-            //wallPaneling.GetComponent<MeshFilter>().sharedMesh = wallBase.GetComponent<MeshFilter>().mesh;
-            //wallPaneling.transform.localPosition = new Vector3(0,0.01f,0);
         }
 
 

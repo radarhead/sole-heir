@@ -27,7 +27,12 @@ namespace SoleHeir
                 b.Encapsulate(r.bounds);
             }
 
-            if(mb.GetComponentsInChildren<ToonOutline>() != null)
+            foreach(var c in mb.GetComponentsInChildren<Collider>())
+            {
+                b.Encapsulate(c.bounds);
+            }
+
+            if(mb.GetComponentInChildren<ToonOutline>() != null)
             {
                 b.Expand(mb.GetComponentInChildren<ToonOutline>().offset * 2);
             }

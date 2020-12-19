@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SoleHeir.GenerationUtils;
 using UnityEngine;
+using Mirror;
 
 namespace SoleHeir
 {
@@ -10,12 +11,13 @@ namespace SoleHeir
         public List<Vector2> outline;
         public DoorType doorType;
 
-        public void Initialize(float roomSpacing)
+        public void Initialize(float spacing)
         {
             for(int i=1; i<outline.Count; i++)
             {
-                transform.Find("Wall").gameObject.GetComponent<CreateMesh>().AddMesh(outline[i], outline[i-1], roomSpacing/2);
+                transform.Find("Wall").gameObject.GetComponent<CreateMesh>().AddMesh(outline[i], outline[i-1], spacing/2);
             }
+            transform.Find("Door Floor").gameObject.GetComponent<CreateMesh>().AddMesh(new Vector2(0,0), new Vector2(GetWidth(), 0), spacing/2);
 
             transform.Find("Door Spacing").localPosition = new Vector3(GetWidth()/2,1.5f,0);
             transform.Find("Door Spacing").localScale = new Vector3(GetWidth(),3,2);

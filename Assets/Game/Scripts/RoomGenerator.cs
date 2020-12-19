@@ -9,23 +9,22 @@ namespace SoleHeir
 {
     public class RoomGenerator : NetworkBehaviour
     {
-        public int seed;
+        [SyncVar] public int seed;
         public float roomWidth = 8.0f;
         public float roomHeight = 6.0f;
         public float roomSpacing = 2.0f;
         public float wallHeight = 3.0f;
-        public GameObject floorPrefab;
-        public GenerationGrid<SpaceType> roomGrid;
-        public GameObject furniturePrefab;
-        public GameObject doorGetter;
         public ColorPalette colorPalette;
         public GameObject spawnerPrefab;
         public Vector3 bottomLeft;
         public Vector3 topRight;
         private int gridSize = 2;
-        private float xSize;
-        private float ySize;
-        [SyncVar] public PrototypeRoom prototypeRoom;
+        [SyncVar] private float xSize;
+        [SyncVar] private float ySize;
+        [SyncVar] public List<int> leftDoors;
+        [SyncVar] public List<int> topDoors;
+        [SyncVar] public List<int> rightDoors;
+        [SyncVar] public List<int> bottomDoors;
         [SyncVar] public bool lights = true;
         public bool built = false;
 
@@ -36,38 +35,55 @@ namespace SoleHeir
         {
             if(!built)
             {
-                BuildRoom();
+                Initialize();
             }
         }
 
-        public void BuildRoom()
+        private List<int> ConvertDoorList(List<PrototypeDoorway> input)
+        {
+            List<int> output = new List<int>();
+            foreach(var doorway in input)
+            {
+                if(doorway?.other==null) output.Add(-1);
+                else output.Add((int)doorway.doorType);
+                
+            }
+            return output;
+        }
+
+        public void SetPrototype(PrototypeRoom prototypeRoom)
         {
             this.seed = prototypeRoom.GetSeed();
-            roomGrid = new GenerationGrid<SpaceType>();
             xSize = prototypeRoom.GetSize().x * (roomWidth + roomSpacing) - roomSpacing;
             ySize = prototypeRoom.GetSize().y * (roomHeight + roomSpacing) - roomSpacing;
-            UnityEngine.Random.InitState(prototypeRoom.GetSeed());
-
             transform.position = new Vector3(prototypeRoom.GetPosition().x * (roomWidth + roomSpacing), 0, prototypeRoom.GetPosition().y * (roomHeight + roomSpacing));
+            leftDoors = ConvertDoorList(prototypeRoom.GetLeftDoorways());
+            rightDoors = ConvertDoorList(prototypeRoom.GetRightDoorways());
+            topDoors = ConvertDoorList(prototypeRoom.GetTopDoorways());
+            bottomDoors = ConvertDoorList(prototypeRoom.GetBottomDoorways());
+        }
+
+        public void Initialize()
+        {
+            UnityEngine.Random.InitState(seed);
 
             GameObject floor = transform.Find("Floor").gameObject;
-            floor.GetComponent<FloorGenerator>().Initialize(prototypeRoom, roomWidth, roomHeight, roomSpacing);
-
+            floor.GetComponent<FloorGenerator>().Initialize(xSize, ySize, roomSpacing);
 
             GameObject leftWall = transform.Find("LeftWall").gameObject;
-            leftWall.GetComponent<WallGenerator>().Initialize(prototypeRoom.GetLeftDoorways(), roomHeight, wallHeight, roomSpacing);
+            leftWall.GetComponent<WallGenerator>().Initialize(leftDoors, roomHeight, wallHeight, roomSpacing);
 
             GameObject rightWall = transform.Find("RightWall").gameObject;
-            rightWall.GetComponent<WallGenerator>().Initialize(prototypeRoom.GetRightDoorways(), roomHeight, wallHeight, roomSpacing);
+            rightWall.GetComponent<WallGenerator>().Initialize(rightDoors, roomHeight, wallHeight, roomSpacing);
             rightWall.transform.localPosition += new Vector3(xSize, 0, 0);
             rightWall.transform.localScale = new Vector3(1, -1, 1);
 
             GameObject topWall = transform.Find("TopWall").gameObject;
-            topWall.GetComponent<WallGenerator>().Initialize(prototypeRoom.GetTopDoorways(), roomWidth, wallHeight, roomSpacing);
+            topWall.GetComponent<WallGenerator>().Initialize(topDoors, roomWidth, wallHeight, roomSpacing);
             topWall.transform.localPosition += new Vector3(0, 0, ySize);
 
             GameObject bottomWall = transform.Find("BottomWall").gameObject;
-            bottomWall.GetComponent<WallGenerator>().Initialize(prototypeRoom.GetBottomDoorways(), roomWidth, wallHeight, roomSpacing);
+            bottomWall.GetComponent<WallGenerator>().Initialize(bottomDoors, roomWidth, wallHeight, roomSpacing);
             bottomWall.transform.localScale = new Vector3(1, -1, 1);
 
             GameObject top = transform.Find("Top").gameObject;
@@ -124,40 +140,15 @@ namespace SoleHeir
         {
 
             //Make bottom wall invisible
-            foreach (var item in transform.Find("BottomWall").gameObject.GetComponentsInChildren<MeshRenderer>())
+            foreach (var item in transform.Find("BottomWall").gameObject.GetComponentsInChildren<Renderer>())
             {
-                item.enabled = !isLocalRoom;
+                if(item.name != "Door Floor") item.enabled = !isLocalRoom;
             }
         }
 
         public void SetEnabled(bool enabled)
         {
             this.isLocalRoom = enabled;
-        }
-
-        public void AddSpawner()
-        {
-
-            // Place the spawner
-            List<Vector2Int> availableSpaces = new List<Vector2Int>();
-            for (int x = 0; x <= roomGrid.GetMaxX(); x++)
-            {
-                for (int y = 0; y <= roomGrid.GetMaxY(); y++)
-                {
-                    if (roomGrid.Get(x, y) == SpaceType.ROOM_OPEN)
-                    {
-                        availableSpaces.Add(new Vector2Int(x, y));
-                    }
-                }
-            }
-
-            if (availableSpaces.Count > 0)
-            {
-                Vector2Int randomPosition = availableSpaces[UnityEngine.Random.Range(0, availableSpaces.Count - 1)];
-                GameObject spawner = Instantiate(spawnerPrefab, transform);
-                spawner.transform.localPosition = new Vector3(randomPosition.x, 0, randomPosition.y + gridSize) / gridSize;
-                NetworkServer.Spawn(spawner);
-            }
         }
 
 
