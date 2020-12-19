@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEditor.Experimental.AssetImporters;
 
@@ -12,46 +13,66 @@ public class LineobjImporter : ScriptedImporter
     {
         int lastSlash = ctx.assetPath.LastIndexOf('/');
         int lastDot = ctx.assetPath.LastIndexOf('.');
-        string assetName = ctx.assetPath;//.Substring(lastSlash + 1, lastDot - lastSlash - 1);
+        string assetName = ctx.assetPath;
 
         GameObject mainAsset = new GameObject();
 
         Dictionary<string, List<string[]>> obj = ParseObj(ctx.assetPath);
-        bool triangleSubmeshExists;
-        Mesh mesh = ConstructMesh(obj, out triangleSubmeshExists);
-        if (mesh == null) return;
-        mesh.name = assetName;
-        MeshFilter meshFilter = mainAsset.AddComponent<MeshFilter>();
-        meshFilter.sharedMesh = mesh;
-        ctx.AddObjectToAsset("Mesh", mesh);
 
-        Material[] materials = new Material[mesh.subMeshCount];
-        Shader standard = Shader.Find("Standard");
-        if (triangleSubmeshExists && mesh.subMeshCount == 2)
+        var lines = SplitLines(obj);
+        int count = 0;
+        Material material = Resources.Load<Material>("Inner Line");
+        foreach (var line in lines)
         {
-            materials[0] = new Material(standard);
-            materials[0].name = "Face Material";
-            materials[1] = new Material(standard);
-            materials[1].name = "Edge Material";
-            ctx.AddObjectToAsset("Face Material", materials[0]);
-            ctx.AddObjectToAsset("Edge Material", materials[1]);
+            count++;
+            LineRenderer lr = new GameObject(string.Format("Line {0}", count)).AddComponent<LineRenderer>();
+            lr.positionCount = line.Count;
+            lr.useWorldSpace = false;
+            lr.material = material;
+            lr.widthMultiplier = 0.03f;
+            lr.SetPositions(line.ToArray());
+            lr.gameObject.transform.parent = mainAsset.transform;
+            ctx.AddObjectToAsset(string.Format("Line {0}", count), lr.gameObject);
         }
-        else if (triangleSubmeshExists && mesh.subMeshCount == 1)
-        {
-            materials[0] = new Material(standard);
-            materials[0].name = "Face Material";
-            ctx.AddObjectToAsset("Face Material", materials[0]);
-        }
-        else if (!triangleSubmeshExists && mesh.subMeshCount == 1)
-        {
-            materials[0] = new Material(standard);
-            materials[0].name = "Edge Material";
-            ctx.AddObjectToAsset("Edge Material", materials[0]);
-        }
-        MeshRenderer renderer = mainAsset.AddComponent<MeshRenderer>();
-        renderer.materials = materials;
         ctx.AddObjectToAsset("ctx", mainAsset);
         ctx.SetMainObject(mainAsset);
+    }
+
+    private List<List<Vector3>> SplitLines(Dictionary<string, List<string[]>> data)
+    {
+        List<string[]> verts = data["v"];
+        List<string[]> edges = data["e"];
+
+        List<List<Vector3>> output = new List<List<Vector3>>();
+
+        int lastIdx = -1;
+
+        for (int i = 0; i < edges.Count; i++)
+        {
+            int[] edge = GetEdge(edges[i]);
+            Vector3 vertex1 = GetVertex(verts[edge[0]]);
+            Vector3 vertex2 = GetVertex(verts[edge[1]]);
+
+            if(lastIdx != edge[0])
+            {
+                output.Add(new List<Vector3>());
+                output.Last().Add(vertex1);
+            }
+            output.Last().Add(vertex2);
+            lastIdx = edge[1];
+        }
+
+        return output;
+    }
+
+    private int[] GetEdge(string[] data)
+    {
+        return new int[] {int.Parse(data[0])-1, int.Parse(data[1])-1};
+    }
+
+    private Vector3 GetVertex(string[] data)
+    {
+        return new Vector3(float.Parse(data[0]), float.Parse(data[1]), float.Parse(data[2]));
     }
 
     private Mesh ConstructMesh(Dictionary<string, List<string[]>> data, out bool triangleSubmeshExists)

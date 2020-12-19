@@ -19,7 +19,21 @@ namespace SoleHeir
 
             transform.Find("Door Spacing").localPosition = new Vector3(GetWidth()/2,1.5f,0);
             transform.Find("Door Spacing").localScale = new Vector3(GetWidth(),3,2);
+            LineRenderer lr = GetComponent<LineRenderer>();
+            lr.positionCount = outline.Count;
+            lr.useWorldSpace = false;
+            //lr.material = material;
+            lr.widthMultiplier = 0.06f;
+
+            var newOutline = new List<Vector3>();
+            foreach (var item in outline)
+            {
+                newOutline.Add(new Vector3(item.x, item.y, 0));
+            }
+            lr.SetPositions(newOutline.ToArray());
         }
+
+        
         
 
         public float GetWidth()

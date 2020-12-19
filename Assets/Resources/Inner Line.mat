@@ -71,13 +71,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - Boolean_10D55747: 0
-    - Boolean_1C4E6012: 0
+    - Boolean_1C4E6012: 1
     - Boolean_51AB5166: 1
     - Boolean_5B7356B: 1
     - Boolean_E47079DE: 1
     - _AlphaClip: 0
     - _Blend: 0
-    - _Boiling: 0.03
+    - _Boiling: 0.01
     - _BumpScale: 1
     - _ColorState: 0
     - _Cull: 2
@@ -98,7 +98,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _UsePalette: 0
+    - _UsePalette: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
