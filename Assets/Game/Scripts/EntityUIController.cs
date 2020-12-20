@@ -23,9 +23,8 @@ namespace SoleHeir
         public Interactable ic;
         public Animator a;
 
-        void Start()
+        void Awake()
         {
-            
         }
 
         void Update()
@@ -44,6 +43,7 @@ namespace SoleHeir
                 if(interactableDisplay == null)
                 {
                     interactableDisplay = Instantiate(Resources.Load("Entity UI")) as GameObject;
+                    interactableDisplay.transform.SetParent(GameplayUIController.instance.transform);
                     text1Object = interactableDisplay.transform.Find("Group/Text 1").gameObject;
                     text2Object = interactableDisplay.transform.Find("Group/Text 2").gameObject;
                     ic = GetComponent<Interactable>();
@@ -109,20 +109,16 @@ namespace SoleHeir
             if(kit)
             {
                 PlayerController pc = ClientScene.localPlayer.GetComponent<PlayerController>();
-                KitController kit =  pc.HeldItem().GetComponentInChildren<KitController>();
-                int remainingPlayers = kit.GetNeededPlayers();
-                if(remainingPlayers > 1)
+                KitController kit =  pc?.HeldItem()?.GetComponentInChildren<KitController>();
+                if(kit!=null && !kit.used)
                 {
-                    SetTextVars(String.Format("{0} Players Needed", remainingPlayers));
+                    int remainingPlayers = kit.GetNeededPlayers();
+                    if(remainingPlayers == 0)
+                    {
+                        SetTextVars(String.Format("(E) Use", remainingPlayers));
+                    }
                 }
-                else if (remainingPlayers == 1)
-                {
-                    SetTextVars(String.Format("1 Player Needed", remainingPlayers));
-                }
-                else
-                {
-                    SetTextVars(String.Format("(E) Use", remainingPlayers));
-                }
+                
             }
 
             if(pickUp)
@@ -132,12 +128,11 @@ namespace SoleHeir
 
             if(sabotage)
             {
-                interactCircle = true;
                 KitController myKit = null;
 
                 if(kit)
                 {
-                    myKit = ClientScene.localPlayer.GetComponent<PlayerController>().HeldItem().GetComponentInChildren<KitController>();
+                    myKit = ClientScene.localPlayer.GetComponent<PlayerController>().HeldItem()?.GetComponentInChildren<KitController>();
                 }
                 else
                 {
@@ -145,11 +140,23 @@ namespace SoleHeir
                 }
                 if(myKit != null)
                 {
-                    a.SetFloat("interact progress", myKit.timer / myKit.interactionTime);
-                }
+                    int remainingPlayers = myKit.GetNeededPlayers();
+                    if(remainingPlayers > 1)
+                    {
+                        SetTextVars(String.Format("{0} Players Needed", remainingPlayers));
+                    }
+                    else if (remainingPlayers == 1)
+                    {
+                        SetTextVars(String.Format("1 Player Needed", remainingPlayers));
+                    }
 
-                
-                SetTextVars("(Q) Sabotage");
+                    a.SetFloat("interact progress", (myKit.interactionTime - myKit.timer) / myKit.interactionTime);
+                    if(myKit.interactionTime>myKit.timer)
+                    {
+                        interactCircle = true;
+                        SetTextVars("(Q) Sabotage");
+                    }
+                }
             }
 
             if(interact && interactCircle && ic!=null && ic.interactor != null)
@@ -194,7 +201,8 @@ namespace SoleHeir
             if(interactableDisplay != null && GetComponentInChildren<Collider>() != null)
             {
                 interactableDisplay.transform.rotation = Quaternion.identity;
-                interactableDisplay.transform.GetChild(0).position = Camera.main.WorldToScreenPoint(GetComponentInChildren<Collider>().bounds.center + new Vector3(0, GetComponentInChildren<Collider>().bounds.size.y/2, 0));
+                interactableDisplay.transform.GetChild(0).position = Camera.main.WorldToScreenPoint(GetComponentInChildren<Collider>().bounds.center
+                     + new Vector3(0, GetComponentInChildren<Collider>().bounds.size.y/2, GetComponentInChildren<Collider>().bounds.size.z/2));
             }
         }
 

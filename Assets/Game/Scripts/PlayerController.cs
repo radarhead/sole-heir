@@ -17,27 +17,25 @@ namespace SoleHeir
         private float airTimer;
         private float jumpTimer;
         // Timers
-        float reloadTimer = 0;
         float rotationTimer = 0;
         private bool bizzareGrounded;
-        private bool bizzareGroundedCheck {get {if(bizzareGrounded){bizzareGrounded=false;return true;}return false;} set{bizzareGrounded=value;}}
+        private bool bizzareGroundedCheck { get { if (bizzareGrounded) { bizzareGrounded = false; return true; } return false; } set { bizzareGrounded = value; } }
+        [SyncVar] public bool holdingFire = false;
 
 
         public GameObject carryablePrefab;
         private Vector2 moveInput;
         private Vector3 acceleration = Vector3.zero;
-        Vector3 aimTarget;
+        public Vector3 aimTarget;
         [SyncVar] public Quaternion rotation = Quaternion.identity;
         [SyncVar] public PlayerStatus status;
 
         Rigidbody body;
         private bool mouseAim = false;
         private Vector2 mousePos = Vector2.zero;
-        public GameObject gunPrefab;
-        public GameObject bulletPrefab;
         public Inventory inventory;
         public Killable killable;
-        public int identity {get{return killable.playerIdentity;}}
+        public int identity { get { return killable.playerIdentity; } }
         [SyncVar] public int carriedItem = 0;
 
         // Nearest objects
@@ -59,7 +57,7 @@ namespace SoleHeir
                 GetComponent<PlayerInput>().enabled = true;
             }
 
-            if(isServer)
+            if (isServer)
             {
                 var list = Object.FindObjectsOfType<NetworkStartPosition>();
                 transform.position = list[Random.Range(0, list.Length)].transform.position;
@@ -71,7 +69,7 @@ namespace SoleHeir
         {
             foreach (var contact in collision.contacts)
             {
-                if(Vector3.Dot(contact.normal, Vector3.up) > 0.5)
+                if (Vector3.Dot(contact.normal, Vector3.up) > 0.5)
                 {
                     bizzareGrounded = true;
                 }
@@ -94,13 +92,13 @@ namespace SoleHeir
             // If the interaction is starting
             if (value.Get<float>() > 0)
             {
-                if (nearestKitInteractable != null)
-                {
-                    CmdStartKit();
-                }
-                else
+                if (nearestInteractable != null)
                 {
                     CmdStartInteraction();
+                }
+                else if (nearestKitInteractable != null)
+                {
+                    CmdStartKit();
                 }
             }
             else
@@ -147,14 +145,14 @@ namespace SoleHeir
         public void OnJump(InputValue value)
         {
             if (!IsAlive()) return;
-            if(status != PlayerStatus.FREE) return;
+            if (status != PlayerStatus.FREE) return;
             if (value.Get<float>() < 1f) return;
 
-            if(airTimer>0 && jumpTimer == 0)
+            if (airTimer > 0 && jumpTimer == 0)
             {
                 airTimer = -1;
                 jumpTimer = airTime;
-                body.velocity = new Vector3(body.velocity.x,5,body.velocity.z);
+                body.velocity = new Vector3(body.velocity.x, 5, body.velocity.z);
             }
         }
 
@@ -175,7 +173,7 @@ namespace SoleHeir
         {
             if (value.Get<Vector2>().magnitude > 0)
             {
-                aimTarget = (new Vector3(value.Get<Vector2>().x, 0, value.Get<Vector2>().y));
+                //aimTarget = (new Vector3(value.Get<Vector2>().x, 0, value.Get<Vector2>().y));
                 mouseAim = false;
                 rotationTimer = rotationTime;
             }
@@ -183,19 +181,21 @@ namespace SoleHeir
 
         public void OnFire(InputValue value)
         {
-            if (status != PlayerStatus.FREE) return;
-            if (value.Get<float>() < 1f) return;
+            CmdSetHoldingFire(value.Get<float>() > 0.5f);
+        }
 
-            if (reloadTimer == 0)
+        [Command]
+        void CmdSetHoldingFire(bool holding)
+        {
+            if (status == PlayerStatus.FREE)
             {
-                Carryable heldItem = HeldItem();
-                if (heldItem != null && heldItem.GetComponent<GunController>()!=null)
-                {
-                    CameraController.instance.SetScreenShake(1f);
-                    CmdShootGun();
-                    reloadTimer = 0.3f;
-                }
+            if (holdingFire == false && holding == true && HeldItem() != null && HeldItem().TryGetComponent<ICarryableShoot>(out var shoot))
+            {
+                shoot.Shoot();
             }
+            this.holdingFire = holding;
+            }
+            else this.holdingFire = false;
         }
 
         public void OnItemOne(InputValue value)
@@ -221,7 +221,7 @@ namespace SoleHeir
         [Command]
         void CmdSabotage()
         {
-            if(nearestSabotageable != null)
+            if (nearestSabotageable != null)
             {
                 nearestSabotageable.sabotaged = true;
             }
@@ -230,7 +230,7 @@ namespace SoleHeir
         [Command]
         void CmdSetCarriedItem(int carriedItem)
         {
-            if(status != PlayerStatus.FREE) return;
+            if (status != PlayerStatus.FREE) return;
 
             Carryable oldItem = HeldItem();
 
@@ -244,15 +244,15 @@ namespace SoleHeir
         [Command]
         void CmdThrowItem(Vector3 aimTarget)
         {
-            if(status != PlayerStatus.FREE) return;
+            if (status != PlayerStatus.FREE) return;
             Carryable item = HeldItem();
-            item.Spawn(Quaternion.LookRotation(aimTarget) * new Vector3(0, 0, 80));
+            item.Spawn(rotation * new Vector3(0, 0, 80));
         }
 
         [Command]
         void CmdPickupItem()
         {
-            if(status != PlayerStatus.FREE) return;
+            if (status != PlayerStatus.FREE) return;
             Carryable nc = GetNearestCarryable();
             if (nc != null)
             {
@@ -263,8 +263,8 @@ namespace SoleHeir
         [Command]
         public void CmdStartInteraction()
         {
-            if(status != PlayerStatus.FREE) return;
-            if(nearestInteractable == null) return;
+            if (status != PlayerStatus.FREE) return;
+            if (nearestInteractable == null) return;
             status = PlayerStatus.INTERACTING;
             nearestInteractable.Interact(this);
         }
@@ -272,10 +272,10 @@ namespace SoleHeir
         [Command]
         public void CmdStartKit()
         {
-            if(status != PlayerStatus.FREE) return;
-            if(nearestKitInteractable == null) return;
+            if (status != PlayerStatus.FREE) return;
+            if (nearestKitInteractable == null) return;
             status = PlayerStatus.KIT_INTERACTING;
-            HeldItem().GetComponent<KitController>().Interact();
+            HeldItem().GetComponent<KitController>().Interact(nearestKitInteractable);
         }
 
         [Command]
@@ -287,43 +287,33 @@ namespace SoleHeir
         [Command]
         public void CmdOpenPlayerMenu()
         {
-            if(status==PlayerStatus.FREE)
+            if (status == PlayerStatus.FREE)
                 status = PlayerStatus.PLAYER_LIST;
         }
         [Command]
         public void CmdClosePlayerMenu()
         {
-            if(status == PlayerStatus.PLAYER_LIST)
+            if (status == PlayerStatus.PLAYER_LIST)
                 status = PlayerStatus.FREE;
         }
 
-        [Command]
-        void CmdShootGun()
-        {
-            if (reloadTimer == 0)
-            {
-                transform.GetComponent<Rigidbody>().AddForce(Quaternion.LookRotation(aimTarget) * new Vector3(0, 0, -200));
-                GameObject bullet = Instantiate(bulletPrefab, transform.position + new Vector3(0, 1, 0), body.rotation);
-                BulletController controller = bullet.GetComponent<BulletController>();
-                controller.player = this;
-                GunController config = HeldItem().GetComponent<GunController>();
-                controller.damage = config.damage;
-                Physics.IgnoreCollision(bullet.GetComponent<Collider>(), gameObject.GetComponentInChildren<Collider>());
-                bullet.GetComponent<Rigidbody>().velocity = body.rotation * new Vector3(0, 0, 80);
-                reloadTimer = 0.3f;
-                NetworkServer.Spawn(bullet);
-            }
-        }
+
 
 
         // Update is called once per frame
         void Update()
         {
-            
-            reloadTimer = Mathf.Max(0f, reloadTimer - Time.deltaTime);
             rotationTimer = Mathf.Max(0f, rotationTimer - Time.deltaTime);
             bool alive = IsAlive();
 
+            KitController kc = HeldItem()?.GetComponent<KitController>();
+
+            nearestKitInteractable = GetNearestOfType<MonoBehaviour>(1.5f, c => kc?.action?.CanUse(c?.gameObject)==true)?.gameObject;
+            nearestInteractable = GetNearestOfType<Interactable>(1.5f, c => c.CanInteract(this));
+            nearestSabotageable = GetNearestOfType<PlayerController>(1.5f, c => c.HeldItem()?.GetComponent<KitController>()?.PreparedToSabotage() == true)?.HeldItem()?.GetComponent<KitController>();
+            nearestCarryable = GetNearestOfType<Carryable>(1.5f, c => c.inventory == null);
+
+            if(nearestInteractable?.gameObject == nearestKitInteractable?.gameObject) nearestInteractable = null;
 
 
             if (!alive)
@@ -338,30 +328,42 @@ namespace SoleHeir
                 }
             }
 
+            Carryable heldItem = HeldItem();
+
+            GameObject kitTarget=null;
+            if(nearestKitInteractable!=null)
+            {
+                kitTarget = HeldItem()?.GetComponent<KitController>()?.target;
+            }
+
             // Handle all movement code
             if (isLocalPlayer)
             {
-                Carryable heldItem = HeldItem();
-
-                if (nearestKitInteractable != null)
-                {
-                    GetOrAddUiController(nearestKitInteractable).CanKit();
-                }
-                else if (nearestInteractable != null)
+                if (nearestInteractable != null)
                 {
                     GetOrAddUiController(nearestInteractable.gameObject).CanInteract();
                 }
+                else if (kitTarget != null)
+                {
+                    GetOrAddUiController(kitTarget).CanKit();
+                }
+                else if(nearestKitInteractable!=null)
+                {
+                    GetOrAddUiController(nearestKitInteractable).CanKit();
+                }
+
+
                 if (nearestSabotageable != null)
                 {
-                    /*
-                    if(nearestSabotageable.GetComponentInParent<PlayerController>().isLocalPlayer)
+                    if(nearestSabotageable?.carryable?.inventory?.GetComponent<PlayerController>()?.isLocalPlayer == true)
                     {
-                        GetOrAddUiController(k.gameObject).CanSabotage();
+                        if(kitTarget!=null) GetOrAddUiController(kitTarget.gameObject).CanSabotage();
+                        else if (nearestKitInteractable!=null) GetOrAddUiController(nearestKitInteractable.gameObject).CanSabotage();
                     }
                     else
                     {
-                        GetOrAddUiController(nearSabotage.gameObject).CanSabotage();
-                    }*/
+                        GetOrAddUiController(nearestSabotageable.gameObject).CanSabotage();
+                    }
                 }
 
                 if (nearestCarryable != null && heldItem == null)
@@ -374,27 +376,32 @@ namespace SoleHeir
                     // Point to the camera
                     if (mouseAim)
                     {
-                        Plane plane = new Plane(Vector3.up, 0);
+                        Plane plane = new Plane(Vector3.up, transform.position.y + 1.5f);
 
                         float distance;
 
                         Ray ray = Camera.main.ScreenPointToRay(mousePos);
-                        if (plane.Raycast(ray, out distance))
+                        if (Physics.Raycast(ray, out var hit, 100f, LayerMask.GetMask("Players", "Furniture")))
                         {
-                            aimTarget = (ray.GetPoint(distance) - transform.position);
-
+                            aimTarget = hit.point;
+                        }
+                        else
+                        {
+                            plane.Raycast(ray, out float enter);
+                            aimTarget = HelperMethods.GetPosition2D(ray.GetPoint(enter));
                         }
                     }
 
                     float speedMod = 1;
-                    if (heldItem != null && heldItem.TryGetComponent<Rigidbody>(out var heldBody)){
+                    if (heldItem != null && heldItem.TryGetComponent<Rigidbody>(out var heldBody))
+                    {
                         speedMod = (body.mass) / (body.mass + heldBody.mass);
                     }
                     Vector3 newVelocity = Vector3.SmoothDamp(body.velocity, new Vector3(moveInput.x, 0, moveInput.y) * speed * speedMod, ref acceleration, smoothTime);
                     body.velocity = new Vector3(newVelocity.x, body.velocity.y, newVelocity.z);
                     if (rotationTimer > 0)
                     {
-                        rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(aimTarget), Time.deltaTime * rotationSpeed);
+                        rotation = Quaternion.Lerp(rotation, Quaternion.LookRotation(HelperMethods.GetPosition2D(aimTarget - body.position)), Time.deltaTime * rotationSpeed);
                     }
                     else
                     {
@@ -408,7 +415,7 @@ namespace SoleHeir
                 else if (status == PlayerStatus.INTERACTING || status == PlayerStatus.KIT_INTERACTING)
                 {
                     Vector3 stoppedVelocity = new Vector3(0, body.velocity.y, 0);
-                    body.velocity = Vector3.Lerp(body.velocity, stoppedVelocity, Time.deltaTime*100);
+                    body.velocity = Vector3.Lerp(body.velocity, stoppedVelocity, Time.deltaTime * 100);
                 }
             }
 
@@ -416,14 +423,14 @@ namespace SoleHeir
             {
                 if (status == PlayerStatus.KIT_INTERACTING)
                 {
-                    if (nearestKitInteractable != null)
+                    if (kitTarget != null)
                     {
-                        if(nearestKitInteractable.TryGetComponent<Rigidbody>(out var r))
+                        if (kitTarget.TryGetComponent<Rigidbody>(out var r))
                         {
                             Vector3 stoppedVelocity = new Vector3(0, r.velocity.y, 0);
                             Vector3 stoppedAngular = new Vector3(r.angularVelocity.x, 0, r.angularVelocity.z);
-                            r.velocity = Vector3.Lerp(r.velocity, stoppedVelocity, Time.deltaTime*100);
-                            r.angularVelocity = Vector3.Lerp(r.angularVelocity, stoppedAngular, Time.deltaTime*100);
+                            r.velocity = Vector3.Lerp(r.velocity, stoppedVelocity, Time.deltaTime * 100);
+                            r.angularVelocity = Vector3.Lerp(r.angularVelocity, stoppedAngular, Time.deltaTime * 100);
                         }
                     }
                     else
@@ -433,38 +440,29 @@ namespace SoleHeir
                 }
             }
 
-            if (HeldItem() != null)
-            {
-                if(HeldItem().TryGetComponent<KitController>(out var kc))
-                {
-                    nearestKitInteractable = GetNearestOfType<MonoBehaviour>(1.5f, c => kc.action.CanUse(c.gameObject)).gameObject;
-                }
-            }
+            
 
-            nearestInteractable = GetNearestOfType<Interactable>(1.5f, c => c.CanInteract(this));
-            nearestSabotageable = GetNearestOfType<KitController>(1.5f, c => c.PreparedToSabotage());
-            nearestCarryable = GetNearestOfType<Carryable>(1.5f, c => c.inventory==null);
-
-            if(bizzareGroundedCheck)
+            if (bizzareGroundedCheck)
             {
                 airTimer = airTime;
             }
             else
             {
-                airTimer = Mathf.Max(0, airTimer-Time.deltaTime);
+                airTimer = Mathf.Max(0, airTimer - Time.deltaTime);
             }
             jumpTimer = Mathf.Max(0, jumpTimer - Time.deltaTime);
         }
 
         void FixedUpdate()
         {
-            
 
-            if(HeldItem() != null)
+
+            if (HeldItem() != null)
             {
-                HeldItem().transform.position = transform.position + rotation * new Vector3(0, 1, 1);
+                HeldItem().transform.position = transform.position + rotation * new Vector3(0, 1.1f, 1);
                 HeldItem().transform.rotation = transform.rotation;
             }
+
             body.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
         }
 
@@ -474,11 +472,11 @@ namespace SoleHeir
             foreach (Carryable c in GetComponentsInChildren<Carryable>())
             {
                 c.GetComponent<Rigidbody>().position = body.position;
-                c.Spawn(body.velocity + Quaternion.LookRotation(aimTarget) * new Vector3(0, 5, 2));
+                c.Spawn(body.velocity + rotation * new Vector3(0, 5, 2));
             }
         }
 
-        
+
 
         public bool IsAlive()
         {
@@ -519,16 +517,16 @@ namespace SoleHeir
         public T GetNearestOfType<T>(float distance, System.Func<T, bool> validate) where T : MonoBehaviour
         {
             // Set this to be in front of player.
-            Vector3 startLocation = transform.position;
+            Vector3 startLocation = transform.position + rotation*Vector3.forward;
             Collider[] hitColliders = Physics.OverlapSphere(startLocation, distance);
             T nearest = null;
             float nearestDistance = distance;
-            foreach(Collider collider in hitColliders)
+            foreach (Collider collider in hitColliders)
             {
                 float thisDistance;
-                if( collider.attachedRigidbody != null &&
-                    collider.attachedRigidbody.TryGetComponent<T>(out T component) && 
-                    (thisDistance = Vector3.Distance(startLocation, collider.ClosestPoint(startLocation)))<nearestDistance && 
+                if (collider.attachedRigidbody != null &&
+                    collider.attachedRigidbody.TryGetComponent<T>(out T component) &&
+                    (thisDistance = Vector3.Distance(startLocation, collider.ClosestPoint(startLocation))) < nearestDistance &&
                     validate(component)
                 )
                 {

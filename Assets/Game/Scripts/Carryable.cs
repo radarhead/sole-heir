@@ -8,7 +8,6 @@ namespace SoleHeir
     public class Carryable : NetworkBehaviour
     {
         public float rarity;
-        [HideInInspector] [SyncVar] public int inventorySpace;
         [HideInInspector] [SyncVar] private NetworkIdentity inventoryId;
         [HideInInspector] public Inventory inventory { get { return inventoryId?.GetComponent<Inventory>(); } set { inventoryId = value?.netIdentity; } }
         public Rigidbody body;
@@ -16,7 +15,7 @@ namespace SoleHeir
 
         public void AddToInventory(Inventory newInventory, int index)
         {
-            newInventory.Set(inventorySpace, this);
+            newInventory.Set(index, this);
         }
 
         void Awake()
@@ -46,8 +45,8 @@ namespace SoleHeir
 
 
             //SetActive(true);
-            body.isKinematic = true;
-            this.inventorySpace = 0;
+            body.isKinematic = false;
+            body.detectCollisions = true;
             transform.parent = CarryableManager.instance.transform;
             body.AddForce(force, ForceMode.Impulse);
             this.inventory = null;
@@ -60,7 +59,7 @@ namespace SoleHeir
             if (inventory != null)
             {
                 // If the item is being carried by a player
-                if (inventory.GetComponent<PlayerController>() && inventory.GetComponent<PlayerController>().carriedItem == inventorySpace)
+                if (inventory.GetComponent<PlayerController>() != null && inventory.GetComponent<PlayerController>().HeldItem() == this)
                 {
                     HelperMethods.HideOrShowObject(gameObject, true);
                 }

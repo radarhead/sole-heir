@@ -15,6 +15,9 @@ namespace SoleHeir
         public GameObject hole;
         public GameObject bullet;
         public Rigidbody body;
+        private Vector3 lastPosition;
+        private bool dead = false;
+
 
         // Start is called before the first frame update
         void Awake()
@@ -22,6 +25,8 @@ namespace SoleHeir
             this.body = GetComponent<Rigidbody>();
             this.bullet = transform.Find("Bullet").gameObject;
             this.hole = transform.Find("Hole").gameObject;
+            hole.SetActive(false);
+            bullet.SetActive(true);
         }
         void Start()
         {
@@ -31,36 +36,58 @@ namespace SoleHeir
             {
                 body.detectCollisions = false;
             }
+            lastPosition = transform.position;
         }
 
-        void OnCollisionEnter(Collision collision) {
-            if(isServer)
+        void Update()
+        {
+            if(isServer && !dead)
             {
-                Killable killable = null;
-                IShootable shootable = null;
-
-                foreach(var contact in collision.contacts)
+                if(Physics.Raycast(lastPosition, (transform.position - lastPosition).normalized, out var hit, Vector3.Distance(transform.position, lastPosition), LayerMask.GetMask("House", "Furniture", "Players")))
                 {
-                    killable = killable ?? contact.otherCollider?.attachedRigidbody?.GetComponent<Killable>();
-                    shootable = shootable ?? contact.otherCollider?.attachedRigidbody?.GetComponent<IShootable>();
-                }
-                
-                killable?.DealDamage(damage, body.velocity, player.identity);
-                shootable?.Shoot(this);
+                    dead=true;
+                    hit.collider.attachedRigidbody?.GetComponent<Killable>()?.DealDamage(damage, body.velocity, player.identity);
+                    hit.collider.attachedRigidbody?.GetComponent<IShootable>()?.Shoot(this);
 
-                body.detectCollisions = false;
-                transform.rotation = Quaternion.LookRotation(collision.contacts[0].normal, Vector3.up);
-                RpcCollide();
+                    transform.rotation = Quaternion.LookRotation(hit.normal, Vector3.up);
+                    transform.position = hit.point + 0.01f * hit.normal;
+
+                    if(LayerMask.GetMask("House") == (LayerMask.GetMask("House") | (1 << hit.collider.gameObject.layer)))
+                    {
+                        RpcCollide(CollideEffect.Hole);
+                    }
+                    else
+                    {
+                        RpcCollide(CollideEffect.None);
+                    }
+
+                }
+                lastPosition = body.position;
             }
+            
         }
+
+
+        
         
         [ClientRpc]
-        void RpcCollide()
+        void RpcCollide(CollideEffect effect)
         {
             body.isKinematic=true;
-            hole.SetActive(true);
+            body.velocity = Vector3.zero;
+            if(effect == CollideEffect.Hole)
+            {
+                hole.SetActive(true);
+            }
             bullet.SetActive(false);
         }
+    }
+
+    public enum CollideEffect
+    {
+        None,
+        Blood,
+        Hole
     }
 
 }

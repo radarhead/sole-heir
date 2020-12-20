@@ -103,7 +103,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4014963123768716748}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 4d2fed69aa3edf74eb6433d111730274, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 4678813167726175527}
   - component: {fileID: 3359284436149730122}
   - component: {fileID: 98512929519386963}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -166,20 +166,14 @@ MonoBehaviour:
   speed: 10
   smoothTime: 0.05
   rotationTime: 1
-  overlapRadius: 2
-  rotationSpeed: 10
-  dodgeRollSpeed: 20
-  dodgeRollTime: 0.2
-  dodgeRollSlowDown: 0.2
-  dodgeRollLag: 0.05
+  rotationSpeed: 20
+  airTime: 0.1
+  holdingFire: 0
   carryablePrefab: {fileID: 8047647315768830398, guid: 677b18cbd77a75f418bbd8d380b98dd4,
     type: 3}
+  aimTarget: {x: 0, y: 0, z: 0}
   rotation: {x: 0, y: 0, z: 0, w: 1}
   status: 0
-  gunPrefab: {fileID: 7812962003808045124, guid: 4684a66dbbefeec43b5cd6d2073a81e1,
-    type: 3}
-  bulletPrefab: {fileID: 6497942227307708545, guid: 9d0e321d43f2b7b4ebca6eb3e2146d73,
-    type: 3}
   inventory: {fileID: 0}
   killable: {fileID: 0}
   carriedItem: 0
@@ -360,9 +354,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  carryablePrefab: {fileID: 0}
-  maxHealth: 0
-  health: 0
+  corpsePrefab: {fileID: 0}
+  maxHealth: 30
+  health: 30
   alive: 1
   playerIdentity: 0
   lastPlayer: 0

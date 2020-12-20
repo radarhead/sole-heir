@@ -9,13 +9,14 @@ namespace SoleHeir
             Inventory inventory = GetComponentInParent<Inventory>();
             Carryable playerItem = player.HeldItem();
             Carryable inventoryItem = inventory.Get(0);
+            
             if(playerItem!=null)
             {
                 playerItem.AddToInventory(inventory,0);
             }
             if(inventoryItem != null)
             {
-                inventoryItem.AddToInventory(player.inventory,player.carriedItem);
+                inventoryItem.AddToInventory(player.inventory, player.carriedItem);
             }
         }
 

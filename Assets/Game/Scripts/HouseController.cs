@@ -18,6 +18,16 @@ namespace SoleHeir
         public NavMeshSurface surface;
         public RoomGenerator playerRoom;
 
+        public static HouseController instance = null;
+
+        void Awake()
+        {
+            if(instance == null)
+            {
+                instance = this;
+            }
+        }
+
         // Start is called before the first frame update
         void Start()
         {
@@ -98,41 +108,46 @@ namespace SoleHeir
             {
                 PlayerController pc = ClientScene.localPlayer.GetComponent<PlayerController>();
                 RoomGenerator currentRoom = HelperMethods.FindCurrentRoom(pc);
+
+                foreach(RoomGenerator rg in GetComponentsInChildren<RoomGenerator>())
+                {
+                    rg.SetEnabled(rg==currentRoom);
+                }
                 if(pc!=null &&currentRoom != null)
                 {
                     Shader.SetGlobalColor("_PaletteDarkColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PaletteDarkColor"),
                             currentRoom.colorPalette.Dark(),
-                            Time.deltaTime*10
+                            Time.deltaTime*5
                         )
                     );
                     Shader.SetGlobalColor("_PaletteDarkAccentColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PaletteDarkAccentColor"),
                             currentRoom.colorPalette.DarkAccent(),
-                            Time.deltaTime*10
+                            Time.deltaTime*5
                         )
                     );
                     Shader.SetGlobalColor("_PalettePrimaryColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PalettePrimaryColor"),
                             currentRoom.colorPalette.Primary(),
-                            Time.deltaTime*10
+                            Time.deltaTime*5
                         )
                     );
                     Shader.SetGlobalColor("_PaletteLightAccentColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PaletteLightAccentColor"),
                             currentRoom.colorPalette.LightAccent(),
-                            Time.deltaTime*10
+                            Time.deltaTime*5
                         )
                     );
                     Shader.SetGlobalColor("_PaletteLightColor",
                         Color.Lerp(
                             Shader.GetGlobalColor("_PaletteLightColor"),
                             currentRoom.colorPalette.Light(),
-                            Time.deltaTime*10
+                            Time.deltaTime*5
                         )
                     );
 
@@ -143,6 +158,7 @@ namespace SoleHeir
                     
                 }
             }
+            
         }
     }
 }

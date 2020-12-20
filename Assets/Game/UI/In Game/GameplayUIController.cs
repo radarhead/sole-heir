@@ -10,6 +10,15 @@ namespace SoleHeir
     {
         public GameObject ppcPrefab;
         public ScrollRect ppcGroup;
+        public static GameplayUIController instance = null;
+
+        void Awake()
+        {
+            if(instance == null)
+            {
+                instance = this;
+            }
+        }
         
         void Update()
         {

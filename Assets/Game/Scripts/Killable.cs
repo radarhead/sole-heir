@@ -8,7 +8,7 @@ namespace SoleHeir
     public class Killable : NetworkBehaviour
     {
         // Prefabs
-        public GameObject carryablePrefab;
+        public GameObject corpsePrefab;
 
         // Config
         [SyncVar] public float maxHealth;
@@ -42,7 +42,12 @@ namespace SoleHeir
             if(!isServer) return;
             if(health <= 0 && alive)
             {
-
+                GetComponent<KillableInterface>().KillMe();
+                if(corpsePrefab != null)
+                {
+                    var go = Instantiate(corpsePrefab, transform.position, transform.rotation);
+                    NetworkServer.Spawn(go);
+                }
             }
         }
     }

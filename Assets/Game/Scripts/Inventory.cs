@@ -56,6 +56,7 @@ namespace SoleHeir
 
         public void Set(int i, Carryable c)
         {
+            if(i >= size) Debug.Log(i);
             inventoryList[i] = c.netIdentity;
             c.inventory = this;
         }

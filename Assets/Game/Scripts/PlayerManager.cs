@@ -13,10 +13,6 @@ namespace SoleHeir
             {
                 instance = this;
             }
-            else if (instance != this)
-            {
-                Destroy (gameObject);
-            }
         }
 
 

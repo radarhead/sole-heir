@@ -25,7 +25,7 @@ namespace SoleHeir
 
         public bool CanUse(GameObject go)
         {
-            return go.GetComponent<CorpseController>()!=null;
+            return go?.GetComponent<CorpseController>()!=null;
         }
 
         public void PerformAction(PlayerController player, GameObject target, bool sabotaged)

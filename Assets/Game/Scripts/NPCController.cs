@@ -14,6 +14,7 @@ namespace SoleHeir
         private float timer=0;
         public float targetTime=10;
 
+
         public void KillMe()
         {
             NetworkServer.Destroy(gameObject);

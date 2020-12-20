@@ -28,8 +28,12 @@ namespace SoleHeir
         [SyncVar] public bool lights = true;
         public bool built = false;
 
-        public bool isLocalRoom = true;
+        public bool isLocalRoom;
 
+        void Awake()
+        {
+            this.transform.parent = HouseController.instance.transform;
+        }
 
         void Start()
         {
@@ -142,7 +146,8 @@ namespace SoleHeir
             //Make bottom wall invisible
             foreach (var item in transform.Find("BottomWall").gameObject.GetComponentsInChildren<Renderer>())
             {
-                if(item.name != "Door Floor") item.enabled = !isLocalRoom;
+                if(item.name == "Door Floor") item.enabled = true;
+                else item.enabled = !isLocalRoom;
             }
         }
 

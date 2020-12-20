@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 6306388840978371972}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 0.35, y: 0.35, z: 0.35}
   m_Children: []
   m_Father: {fileID: 4692897093754075369}
   m_RootOrder: 1
@@ -94,8 +94,8 @@ GameObject:
   - component: {fileID: 4560739197070745890}
   - component: {fileID: 1155671739832980172}
   - component: {fileID: 1006790969302356142}
-  - component: {fileID: 8077952681492368662}
   - component: {fileID: 7422493042517582490}
+  - component: {fileID: 9035949127674429967}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: Untagged
@@ -149,8 +149,8 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 4
-  m_CollisionDetection: 2
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!114 &1155671739832980172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,19 +191,6 @@ MonoBehaviour:
   hole: {fileID: 0}
   bullet: {fileID: 0}
   body: {fileID: 0}
---- !u!135 &8077952681492368662
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6497942227307708545}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!96 &7422493042517582490
 TrailRenderer:
   serializedVersion: 2
@@ -244,7 +231,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.2
+  m_Time: 0.1
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -310,6 +297,24 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
   m_Emitting: 1
+--- !u!114 &9035949127674429967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6497942227307708545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f74aedd71d9a4f55b3ce499326d45fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  clientAuthority: 0
+  localPositionSensitivity: 0.01
+  localRotationSensitivity: 0.01
+  localScaleSensitivity: 0.01
 --- !u!1 &7869011701035311035
 GameObject:
   m_ObjectHideFlags: 0
