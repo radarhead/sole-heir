@@ -22,6 +22,7 @@ namespace SoleHeir
 
         void Update()
         {
+            if(!isServer) return;
             //timer -= Time.deltaTime;
             if(agent.remainingDistance<2)
             {
@@ -34,27 +35,26 @@ namespace SoleHeir
                 var list = Object.FindObjectsOfType<NetworkStartPosition>();
                 agent.destination = list[Random.Range(0, list.Length)].transform.position;
             }
-            if(isServer)
+
+            if(spawned == false)
             {
-                if(spawned == false)
+                
+                Random.InitState(System.DateTime.Now.Millisecond);
+                UnityEngine.Object[] spawners = GameObject.FindGameObjectsWithTag("SpawnLocation");
+                if(spawners.Length > 0)
                 {
+                    int randVal = Random.Range(0, spawners.Length);
+                    GameObject spawner = spawners[randVal] as GameObject;
+                    this.transform.position = spawner.transform.position + new Vector3(1,0,1);
+                    spawned = true;
                     
-                    Random.InitState(System.DateTime.Now.Millisecond);
-                    UnityEngine.Object[] spawners = GameObject.FindGameObjectsWithTag("SpawnLocation");
-                    if(spawners.Length > 0)
-                    {
-                        int randVal = Random.Range(0, spawners.Length);
-                        GameObject spawner = spawners[randVal] as GameObject;
-                        this.transform.position = spawner.transform.position + new Vector3(1,0,1);
-                        spawned = true;
-                        
-                    }
                 }
             }
         }
 
         void Start()
         {
+            if(!isServer) return;
             this.agent = GetComponent<NavMeshAgent>();
             this.body = GetComponent<Rigidbody>();
             var list = Object.FindObjectsOfType<NetworkStartPosition>();

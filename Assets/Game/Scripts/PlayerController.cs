@@ -21,6 +21,7 @@ namespace SoleHeir
         private bool bizzareGrounded;
         private bool bizzareGroundedCheck { get { if (bizzareGrounded) { bizzareGrounded = false; return true; } return false; } set { bizzareGrounded = value; } }
         [SyncVar] public bool holdingFire = false;
+        [SyncVar] public string dissonancePlayerName;
 
 
         public GameObject carryablePrefab;
@@ -55,6 +56,7 @@ namespace SoleHeir
             if (isLocalPlayer)
             {
                 GetComponent<PlayerInput>().enabled = true;
+                this.dissonancePlayerName = FindObjectOfType<Dissonance.DissonanceComms>().LocalPlayerName;
             }
 
             if (isServer)

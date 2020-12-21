@@ -38,7 +38,7 @@ namespace SoleHeir
                 ClientScene.RegisterPrefab(furniture.gameObject);
             }
 
-            foreach(Carryable carryable in Resources.LoadAll<Carryable>("Carryable"))
+            foreach(Carryable carryable in Resources.LoadAll<Carryable>("Carryables"))
             {
                 ClientScene.RegisterPrefab(carryable.gameObject);
             }
